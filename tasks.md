@@ -63,7 +63,7 @@ curl http://localhost:3000   # → 200 OK
 
 **Probar**:
 ```
-GET https://faro.up.railway.app   → 200 OK
+GET https://faro-isleca.up.railway.app   → 200 OK
 ```
 
 ---

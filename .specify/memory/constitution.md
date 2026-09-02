@@ -1,18 +1,23 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.0.1
-- Rationale: PATCH amendment — corrects a stale source name in Principle IV's parenthetical list.
-  "Google Site Kit" never appears in `specs/001-informe-mensual-seo/spec.md`, `plan.md`,
-  `data-model.md`, or `tasks.md`, which all consistently name the analytics source "GA4 Analytics
-  (GA4 Data API)". Flagged by `/speckit-analyze` (finding F2) as a terminology drift between the
-  ratified constitution and the actual feature artifacts; no normative behavior changes.
-- Modified principles: IV. Resiliencia ante fuentes externas (wording only — the MUST clause
-  itself, max 3 retries / non-blocking failure, is unchanged)
+- Version change: 1.0.1 → 1.0.2
+- Rationale: PATCH amendment — the Railway production URL changed from
+  https://faro.up.railway.app to https://faro-isleca.up.railway.app (Railway project slug
+  changed). Updated in "Despliegue y Operación" to keep the constitution as the accurate source
+  of truth; no normative behavior changes. Companion non-governance change: the same URL was
+  also corrected in the root-level spec.md, plan.md, tasks.md and in
+  specs/001-informe-mensual-seo/tasks.md (T048) — those are content updates outside this
+  command's scope, not constitution amendments.
+- Modified principles: none — this touches "Despliegue y Operación" only, not a Core Principle.
 - Added sections: none
 - Removed sections: none
 - Deferred placeholders: none
-- Templates requiring follow-up: none — this is a documentation-only correction; no downstream
-  command behavior depends on the specific source name used in the parenthetical.
+- Templates requiring follow-up: none — this is a factual/data correction; no downstream command
+  behavior depends on the literal URL string.
+
+Prior amendment (1.0.0 → 1.0.1): corrected a stale source name in Principle IV's parenthetical
+list — "Google Site Kit" → "GA4 Analytics (GA4 Data API)" — flagged by `/speckit-analyze`
+(finding F2) as a terminology drift between the ratified constitution and the feature artifacts.
 -->
 
 # Faro Constitution
@@ -99,7 +104,7 @@ elGriegoNET.
 - Despliegue en Railway, con PostgreSQL como add-on gestionado por Railway.
 - Variables de entorno: fichero `.env` en local (nunca commiteado; ver `.env.example` como
   plantilla), y configuradas directamente en el dashboard de Railway en producción.
-- URL de producción: https://faro.up.railway.app
+- URL de producción: https://faro-isleca.up.railway.app
 - Repositorio: https://github.com/islecaia/Faro.git
 
 ## Governance
@@ -122,4 +127,4 @@ llegara a entrar en conflicto con ella.
 - Guía de implementación complementaria (no normativa): `spec.md` (requisitos funcionales),
   `plan.md` (plan de construcción), `DESIGN.md` (sistema de diseño visual).
 
-**Version**: 1.0.1 | **Ratified**: 2026-09-02 | **Last Amended**: 2026-09-02
+**Version**: 1.0.2 | **Ratified**: 2026-09-02 | **Last Amended**: 2026-09-02

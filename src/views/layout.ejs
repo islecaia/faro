@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script>
+    const t = localStorage.getItem('faro-theme');
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof screenHeading !== 'undefined' ? screenHeading + ' · Faro' : 'Faro' %></title>
@@ -20,6 +24,9 @@
     <div class="main-column">
       <header class="header-bar">
         <span class="app-title">FARO</span>
+        <button id="theme-toggle" class="btn-ghost" type="button" aria-label="Cambiar tema">
+          <span id="theme-toggle-icon">🌙</span>
+        </button>
       </header>
       <main class="content">
         <%- body %>
@@ -27,5 +34,30 @@
     </div>
   </div>
   <script src="/app.js"></script>
+  <script>
+    (function () {
+      const toggle = document.getElementById('theme-toggle');
+      const icon = document.getElementById('theme-toggle-icon');
+
+      function updateIcon() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        icon.textContent = isDark ? '☀️' : '🌙';
+      }
+
+      updateIcon();
+
+      toggle.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+          document.documentElement.removeAttribute('data-theme');
+          localStorage.setItem('faro-theme', 'light');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          localStorage.setItem('faro-theme', 'dark');
+        }
+        updateIcon();
+      });
+    })();
+  </script>
 </body>
 </html>

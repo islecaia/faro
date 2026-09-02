@@ -1,4 +1,69 @@
 :root {
+  /* Tema claro (día) — predeterminado. Ver DESIGN.md §2/§5. */
+
+  /* Fondos */
+  --bg-app:           #FFFFFF;
+  --bg-panel:         #F7F7F5;
+  --bg-card:          #FFFFFF;
+  --bg-card-hover:    #F7F7F5;
+  --bg-input:         #FFFFFF;
+
+  /* Bordes */
+  --border-subtle:    #DEDED9;
+  --border-strong:    #101114;
+
+  /* Marca */
+  --brand-primary:    #101114;
+  --brand-primary-hover: #343537;
+  --brand-primary-dim:   #F4F4F2;
+  --brand-accent:     #B45309;
+  --brand-accent-hover:  #92400E;
+
+  /* Estados */
+  --status-success:   #108043;
+  --status-warning:   #B45309;
+  --status-error:     #DC2626;
+  --status-info:      #1D4ED8;
+  --status-neutral:   #666B73;
+
+  /* Texto */
+  --text-primary:     #101114;
+  --text-secondary:   #666B73;
+  --text-muted:       #9CA3AF;
+  --text-on-brand:    #FFFFFF;
+  --text-zero:        #9CA3AF;
+
+  /* Degradados */
+  --gradient-brand:   linear-gradient(135deg, #101114 0%, #101114 100%);
+  --gradient-rainbow: none;
+  --gradient-card:    linear-gradient(160deg, #FFFFFF 0%, #FFFFFF 100%);
+
+  /* Radios */
+  --radius-sm:  6px;
+  --radius-md:  7px;
+  --radius-lg:  10px;
+  --radius-xl:  12px;
+
+  /* Espaciado */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Tipografía */
+  --font-display:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-ui:       'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
+  --font-mono:     'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
+}
+
+[data-theme="dark"] {
+  /* Tema oscuro (noche) — solo los tokens que cambian. Ver DESIGN.md §2/§5. */
+
   /* Fondos */
   --bg-app:           #0F000A;
   --bg-panel:         #1A000F;
@@ -28,7 +93,6 @@
   --text-primary:     #FFFFFF;
   --text-secondary:   #C8A8BF;
   --text-muted:       #7A5A73;
-  --text-on-brand:    #FFFFFF;
   --text-zero:        #4A3548;
 
   /* Degradados */
@@ -42,20 +106,8 @@
   --radius-lg:  12px;
   --radius-xl:  16px;
 
-  /* Espaciado */
-  --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-5:  20px;
-  --space-6:  24px;
-  --space-8:  32px;
-  --space-10: 40px;
-  --space-12: 48px;
-
   /* Tipografía */
   --font-display:  'Bebas Neue', 'Impact', sans-serif;
-  --font-ui:       'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
   --font-mono:     'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 }
 

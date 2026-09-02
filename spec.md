@@ -3,7 +3,7 @@
 **Nombre de la aplicación**: Faro
 **Rama**: `002-informe-web-railway`
 **Repo**: https://github.com/islecaia/Faro.git
-**URL producción**: https://faro.up.railway.app
+**URL producción**: https://faro-isleca.up.railway.app
 **Creada**: 2026-08-31
 **Estado**: Borrador
 **Stack**: Node.js + Express + PostgreSQL, desplegada en Railway

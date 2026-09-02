@@ -176,7 +176,7 @@ del repositorio. Sin carpeta `tests/` (ver Tests arriba).
 - [X] T045 [P] Revisar todas las vistas EJS contra `DESIGN.md` §5 y §7 (botones, alertas inline, tono de textos) y ajustar `public/style.css` donde falte algún componente
 - [X] T046 Ejecutar la validación completa de `quickstart.md` (US1, US2, US3, US4, US5) de principio a fin en un entorno con datos reales o de prueba
 - [X] T047 [P] Auditar `package.json` para confirmar que no se ha introducido ninguna dependencia prohibida por la Constitución (React, Vue, Tailwind, Webpack, TypeScript, cualquier ORM). Verificar que no existe ninguna ruta PUT/DELETE sobre `/reports` o `/sites/:id` (excepto `/deactivate`), y que no se introdujo middleware de sesión o autenticación.
-- [ ] T048 Desplegar en Railway (add-on PostgreSQL, variables de entorno del dashboard) y verificar que `https://faro.up.railway.app` responde con el flujo MVP completo
+- [ ] T048 Desplegar en Railway (add-on PostgreSQL, variables de entorno del dashboard) y verificar que `https://faro-isleca.up.railway.app` responde con el flujo MVP completo
 
 ---
 

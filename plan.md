@@ -2,7 +2,7 @@
 
 **Rama**: `002-informe-web-railway`
 **Repo**: https://github.com/islecaia/Faro.git
-**URL producción**: https://faro.up.railway.app
+**URL producción**: https://faro-isleca.up.railway.app
 **Fecha**: 2026-09-02
 **Fuentes**: `spec.md` v2 + `DESIGN.md` v1.0
 
@@ -433,4 +433,4 @@ El MVP está listo cuando:
 - [ ] El formulario de informe se precarga con esos datos y el email llega al cliente al pulsar "ENVIAR"
 - [ ] Las oportunidades SEO aparecen en el dashboard sin revisión manual
 - [ ] Los fallos de fuente no bloquean el informe y se notifican por email
-- [ ] La app está desplegada y funcional en https://faro.up.railway.app
+- [ ] La app está desplegada y funcional en https://faro-isleca.up.railway.app
