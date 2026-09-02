@@ -14,6 +14,11 @@ CREATE TABLE IF NOT EXISTS sites (
   created_at        TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Qué herramienta concreta cubre cada categoría de dato para este sitio, p. ej.
+-- { "clicks": "Google Site Kit", "visits": "Rybbit", "keywords": "Ubersuggest",
+--   "pagespeed": "PageSpeed Insights", "security": "Security Ninja" }
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS sources_config JSONB DEFAULT '{}';
+
 CREATE TABLE IF NOT EXISTS monthly_records (
   id              SERIAL PRIMARY KEY,
   site_id         INTEGER REFERENCES sites(id),

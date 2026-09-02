@@ -1,3 +1,21 @@
+<%
+const sourceOptions = [
+  '', 'Google Site Kit', 'Squirrly SEO', 'Google Rankings', 'Rybbit',
+  'Ubersuggest', 'PageSpeed Insights', 'Security Ninja',
+];
+function renderSourceSelect(name, label) {
+  const options = sourceOptions.map((opt) => {
+    const optLabel = opt === '' ? '— Sin configurar —' : opt;
+    return `<option value="${opt}">${optLabel}</option>`;
+  }).join('');
+  return `
+    <div class="field">
+      <label for="${name}">${label}</label>
+      <select id="${name}" name="${name}">${options}</select>
+    </div>`;
+}
+%>
+
 <h1 class="screen-heading">Añadir sitio</h1>
 
 <form action="/sites" method="post" class="form-grid">
@@ -17,27 +35,12 @@
   </div>
 
   <p class="section-label">Fuentes de datos</p>
-  <p class="caption">PageSpeed Insights no necesita identificador — usa la URL del sitio.</p>
 
-  <div class="field">
-    <label for="sc_property_id">Search Console — property ID</label>
-    <input type="text" id="sc_property_id" name="sc_property_id">
-  </div>
-
-  <div class="field">
-    <label for="ga_property_id">GA4 Analytics — property ID</label>
-    <input type="text" id="ga_property_id" name="ga_property_id">
-  </div>
-
-  <div class="field">
-    <label for="keywords_site_id">Keywords (Squirrly/Ubersuggest) — site ID</label>
-    <input type="text" id="keywords_site_id" name="keywords_site_id">
-  </div>
-
-  <div class="field">
-    <label for="security_site_id">Security Ninja — site ID</label>
-    <input type="text" id="security_site_id" name="security_site_id">
-  </div>
+  <%- renderSourceSelect('source_clicks', 'Fuente de impresiones/clics') %>
+  <%- renderSourceSelect('source_visits', 'Fuente de visitas') %>
+  <%- renderSourceSelect('source_keywords', 'Fuente de keywords') %>
+  <%- renderSourceSelect('source_pagespeed', 'Fuente de rendimiento') %>
+  <%- renderSourceSelect('source_security', 'Fuente de seguridad') %>
 
   <div>
     <button type="submit" class="btn btn-primary"><i class="ph ph-check"></i> Guardar sitio</button>

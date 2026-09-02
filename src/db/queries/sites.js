@@ -18,9 +18,16 @@ async function getSiteById(id) {
 }
 
 async function createSite(data) {
+  const sourcesConfig = {};
+  if (data.source_clicks) sourcesConfig.clicks = data.source_clicks;
+  if (data.source_visits) sourcesConfig.visits = data.source_visits;
+  if (data.source_keywords) sourcesConfig.keywords = data.source_keywords;
+  if (data.source_pagespeed) sourcesConfig.pagespeed = data.source_pagespeed;
+  if (data.source_security) sourcesConfig.security = data.source_security;
+
   const { rows } = await pool.query(
-    `INSERT INTO sites (name, url, client_email, sc_property_id, ga_property_id, keywords_site_id, security_site_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `INSERT INTO sites (name, url, client_email, sc_property_id, ga_property_id, keywords_site_id, security_site_id, sources_config)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING *`,
     [
       data.name,
@@ -30,6 +37,7 @@ async function createSite(data) {
       data.ga_property_id || null,
       data.keywords_site_id || null,
       data.security_site_id || null,
+      JSON.stringify(sourcesConfig),
     ]
   );
   return rows[0];
