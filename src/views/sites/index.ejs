@@ -33,7 +33,7 @@ function fmtDateTime(date) {
       <tbody>
         <% sites.forEach(site => { %>
           <tr>
-            <td style="font-family: var(--font-ui);"><%= site.name %></td>
+            <td style="font-family: var(--font-ui);"><a href="/sites/<%= site.id %>"><%= site.name %></a></td>
             <td><%= site.url %></td>
             <td><%= site.client_email %></td>
             <td><span class="badge badge-conectado">ACTIVO</span></td>

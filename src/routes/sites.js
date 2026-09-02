@@ -26,6 +26,20 @@ router.get('/new', async (req, res, next) => {
   }
 });
 
+router.get('/:id', async (req, res, next) => {
+  try {
+    const site = await sitesQueries.getSiteById(req.params.id);
+    if (!site) return res.status(404).send('Sitio no encontrado');
+    const lastReportDate = await sitesQueries.getLastReportDate(site.id);
+    await res.renderPage('sites/detail', {
+      screenHeading: site.name,
+      site: { ...site, last_report_date: lastReportDate },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/', async (req, res, next) => {
   try {
     await sitesQueries.createSite(req.body);

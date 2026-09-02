@@ -1,0 +1,53 @@
+<%
+function fmtDateTime(date) {
+  if (!date) return '—';
+  const d = new Date(date);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+const SOURCE_CATEGORIES = [
+  { key: 'clicks', label: 'Impresiones / Clics' },
+  { key: 'visits', label: 'Visitas' },
+  { key: 'keywords', label: 'Keywords' },
+  { key: 'pagespeed', label: 'Rendimiento' },
+  { key: 'security', label: 'Seguridad' },
+];
+%>
+
+<div style="display:flex; align-items:center; justify-content:space-between;">
+  <h1 class="screen-heading"><%= site.name %></h1>
+  <div>
+    <button type="button" class="btn btn-secondary" disabled>Editar</button>
+    <a href="/sites" class="btn btn-ghost">Volver a sitios</a>
+  </div>
+</div>
+
+<div class="card">
+  <p class="section-label">Datos del sitio</p>
+  <p><strong>URL:</strong> <a href="<%= site.url %>" target="_blank" rel="noopener"><%= site.url %></a></p>
+  <p><strong>Email del cliente:</strong> <%= site.client_email %></p>
+  <p class="caption">Último informe: <%= fmtDateTime(site.last_report_date) %></p>
+</div>
+
+<div>
+  <p class="section-label">Fuentes de datos configuradas</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Herramienta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% SOURCE_CATEGORIES.forEach(cat => { %>
+          <tr>
+            <td style="font-family: var(--font-ui);"><%= cat.label %></td>
+            <td style="font-family: var(--font-ui);"><%= (site.sources_config && site.sources_config[cat.key]) || '— Sin configurar —' %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
