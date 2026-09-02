@@ -15,12 +15,16 @@ function sourceTooltip(sourcesUsed, category) {
 // de un sitio se mantenga estable independientemente del tema activo).
 const SITE_COLORS = ['#FF0054', '#FF4500', '#FFB800', '#00C896', '#3DB8FF', '#7B2FF7', '#E91E8C', '#FF9E00'];
 function siteColor(siteId) {
-  const index = Number(siteId) % SITE_COLORS.length;
+  const numericId = parseInt(siteId, 10);
+  const index = Number.isNaN(numericId) ? 0 : numericId % SITE_COLORS.length;
   return SITE_COLORS[index];
 }
-// El error tiene prioridad visual sobre el color de identificación del sitio.
+// El error tiene prioridad visual sobre el color de identificación del sitio. Se acepta
+// tanto 'failed' (valor que usa sources_status) como 'fallida' (valor que usa sources_used),
+// por si en el futuro se compara cualquiera de los dos campos aquí.
 function rowBorderColor(row) {
-  const hasError = Object.values(row.sources_status || {}).includes('failed');
+  const statuses = Object.values(row.sources_status || {});
+  const hasError = statuses.some((status) => status === 'failed' || status === 'fallida');
   return hasError ? 'var(--status-error)' : siteColor(row.site_id);
 }
 %>
