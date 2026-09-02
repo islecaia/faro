@@ -59,8 +59,12 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="btn-spinner"></span> Generando…';
 
-      fetch(form.action, { method: 'POST' })
+      var controller = new AbortController();
+      var timeoutId = setTimeout(function () { controller.abort(); }, 30000);
+
+      fetch(form.action, { method: 'POST', signal: controller.signal })
         .then(function (response) {
+          clearTimeout(timeoutId);
           if (response.ok) {
             window.location.href = response.url;
             return;
@@ -68,12 +72,15 @@
           throw new Error('No se pudo generar el informe. Inténtalo de nuevo.');
         })
         .catch(function (err) {
+          clearTimeout(timeoutId);
           btn.disabled = false;
           btn.innerHTML = originalHtml;
           showError(
-            err instanceof TypeError
-              ? 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.'
-              : err.message
+            err.name === 'AbortError'
+              ? 'El servidor tardó demasiado. El informe puede haberse generado igualmente — comprueba el histórico.'
+              : err instanceof TypeError
+                ? 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.'
+                : err.message
           );
         });
     });
