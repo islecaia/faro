@@ -10,6 +10,19 @@ function sourceTooltip(sourcesUsed, category) {
   if (!entry || !entry.tool) return '';
   return ` data-tooltip="${entry.tool} · ${entry.status}"`;
 }
+// Paleta fija de identificación por sitio (colores de marca de Faro, iguales en ambos temas
+// — igual que --gradient-rainbow, no son tokens que cambien con el tema, para que el color
+// de un sitio se mantenga estable independientemente del tema activo).
+const SITE_COLORS = ['#FF0054', '#FF4500', '#FFB800', '#00C896', '#3DB8FF', '#7B2FF7', '#E91E8C', '#FF9E00'];
+function siteColor(siteId) {
+  const index = Number(siteId) % SITE_COLORS.length;
+  return SITE_COLORS[index];
+}
+// El error tiene prioridad visual sobre el color de identificación del sitio.
+function rowBorderColor(row) {
+  const hasError = Object.values(row.sources_status || {}).includes('failed');
+  return hasError ? 'var(--status-error)' : siteColor(row.site_id);
+}
 %>
 
 <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -75,7 +88,7 @@ function sourceTooltip(sourcesUsed, category) {
         <tbody>
           <% historical.forEach(row => { %>
             <tr class="<%= Object.values(row.sources_status || {}).includes('failed') ? 'row-error' : '' %>">
-              <td style="font-family: var(--font-ui);"><%= row.site_name %></td>
+              <td style="font-family: var(--font-ui); border-left: 3px solid <%= rowBorderColor(row) %>;"><%= row.site_name %></td>
               <td><%= new Date(row.period).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) %></td>
               <td<%- sourceTooltip(row.sources_used, 'clicks') %> data-value="<%= row.impressions %>"><%= row.impressions %></td>
               <td<%- sourceTooltip(row.sources_used, 'clicks') %> data-value="<%= row.clicks %>"><%= row.clicks %></td>
