@@ -91,6 +91,7 @@ function rowBorderColor(row) {
         </thead>
         <tbody>
           <% historical.forEach(row => { %>
+            <!-- DEBUG rowBorderColor: site_id=<%- JSON.stringify(row.site_id) %> sources_status=<%- JSON.stringify(row.sources_status) %> -->
             <tr class="<%= Object.values(row.sources_status || {}).includes('failed') ? 'row-error' : '' %>">
               <td style="font-family: var(--font-ui); border-left: 3px solid <%= rowBorderColor(row) %>;"><%= row.site_name %></td>
               <td><%= new Date(row.period).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) %></td>
