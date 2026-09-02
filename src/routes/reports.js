@@ -8,12 +8,38 @@ const emailService = require('../services/email');
 
 const ZERO_CHECK_METRICS = ['impressions', 'clicks', 'visits', 'attacks_blocked'];
 
+// Traduce cada categoría de sources_config (elegida por el Admin en el alta del sitio) a la
+// clave correspondiente de sources_status que devuelve el collector para esa misma fuente.
+const SOURCE_STATUS_KEY = {
+  clicks: 'search_console',
+  visits: 'analytics',
+  keywords: 'keywords',
+  pagespeed: 'pagespeed',
+  security: 'security',
+};
+
 const router = express.Router();
 
 function previousMonthPeriod() {
   const now = new Date();
   const period = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
   return period.toISOString().slice(0, 10);
+}
+
+// Construye, en el momento de generar el informe, qué herramienta se usó para cada categoría
+// de dato y si tuvo éxito. Solo incluye una categoría si el sitio tiene una herramienta
+// configurada para ella (sources_config); si no, no hay nada que registrar ahí.
+function buildSourcesUsed(sourcesConfig, sourcesStatus) {
+  const sourcesUsed = {};
+  for (const [category, statusKey] of Object.entries(SOURCE_STATUS_KEY)) {
+    const tool = sourcesConfig && sourcesConfig[category];
+    if (!tool) continue;
+    sourcesUsed[category] = {
+      tool,
+      status: sourcesStatus[statusKey] === 'failed' ? 'fallida' : 'ok',
+    };
+  }
+  return sourcesUsed;
 }
 
 router.get('/generate/:site_id', async (req, res, next) => {
@@ -39,6 +65,7 @@ router.post('/generate/:site_id', async (req, res, next) => {
       period,
       ...data,
       sources_status,
+      sources_used: buildSourcesUsed(site.sources_config, sources_status),
     });
 
     await keywordsQueries.insertKeywords(site.id, period, keywords);

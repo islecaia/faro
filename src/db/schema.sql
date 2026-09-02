@@ -42,6 +42,10 @@ CREATE TABLE IF NOT EXISTS monthly_records (
 
 CREATE INDEX IF NOT EXISTS idx_monthly_records_site_period ON monthly_records (site_id, period);
 
+-- Qué herramienta concreta se usó realmente para cada categoría de dato en este registro
+-- y si tuvo éxito, p. ej. { "clicks": { "tool": "Google Site Kit", "status": "ok" }, ... }
+ALTER TABLE monthly_records ADD COLUMN IF NOT EXISTS sources_used JSONB DEFAULT '{}';
+
 CREATE TABLE IF NOT EXISTS keywords (
   id              SERIAL PRIMARY KEY,
   site_id         INTEGER REFERENCES sites(id),

@@ -5,8 +5,8 @@ async function insertMonthlyRecord(record) {
     `INSERT INTO monthly_records (
        site_id, period, impressions, clicks, visits,
        pct_direct, pct_organic, pct_social, pct_referral, pct_other,
-       score_mobile, score_desktop, attacks_blocked, threats_count, sources_status
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+       score_mobile, score_desktop, attacks_blocked, threats_count, sources_status, sources_used
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
      RETURNING *`,
     [
       record.site_id,
@@ -24,6 +24,7 @@ async function insertMonthlyRecord(record) {
       record.attacks_blocked,
       record.threats_count,
       JSON.stringify(record.sources_status || {}),
+      JSON.stringify(record.sources_used || {}),
     ]
   );
   return rows[0];

@@ -5,6 +5,11 @@ function fmtDelta(value) {
   const cls = value >= 0 ? 'positive' : 'negative';
   return `<div class="kpi-card-delta ${cls}">${arrow} ${Math.abs(value)}% vs mes anterior</div>`;
 }
+function sourceTooltip(sourcesUsed, category) {
+  const entry = sourcesUsed && sourcesUsed[category];
+  if (!entry || !entry.tool) return '';
+  return ` data-tooltip="${entry.tool} · ${entry.status}"`;
+}
 %>
 
 <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -62,19 +67,9 @@ function fmtDelta(value) {
       <table>
         <thead>
           <tr>
-            <th>Sitio</th><th>Fecha</th>
-            <th data-tooltip="Google Search Console">Impresiones</th>
-            <th data-tooltip="Google Search Console">Clics</th>
-            <th data-tooltip="Google Analytics 4">Visitas</th>
-            <th data-tooltip="Google Analytics 4">% Directo</th>
-            <th data-tooltip="Google Analytics 4">% Orgánico</th>
-            <th data-tooltip="Google Analytics 4">% Social</th>
-            <th data-tooltip="Google Analytics 4">% Referral</th>
-            <th data-tooltip="Google Analytics 4">% Otro</th>
-            <th data-tooltip="Google PageSpeed Insights">PS Mobile</th>
-            <th data-tooltip="Google PageSpeed Insights">PS Desktop</th>
-            <th data-tooltip="Security Ninja">Ataques</th>
-            <th data-tooltip="Security Ninja">Amenazas</th>
+            <th>Sitio</th><th>Fecha</th><th>Impresiones</th><th>Clics</th><th>Visitas</th>
+            <th>% Directo</th><th>% Orgánico</th><th>% Social</th><th>% Referral</th><th>% Otro</th>
+            <th>PS Mobile</th><th>PS Desktop</th><th>Ataques</th><th>Amenazas</th>
           </tr>
         </thead>
         <tbody>
@@ -82,18 +77,18 @@ function fmtDelta(value) {
             <tr class="<%= Object.values(row.sources_status || {}).includes('failed') ? 'row-error' : '' %>">
               <td style="font-family: var(--font-ui);"><%= row.site_name %></td>
               <td><%= new Date(row.period).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) %></td>
-              <td data-value="<%= row.impressions %>"><%= row.impressions %></td>
-              <td data-value="<%= row.clicks %>"><%= row.clicks %></td>
-              <td data-value="<%= row.visits %>"><%= row.visits %></td>
-              <td data-value="<%= row.pct_direct %>"><%= row.pct_direct %></td>
-              <td data-value="<%= row.pct_organic %>"><%= row.pct_organic %></td>
-              <td data-value="<%= row.pct_social %>"><%= row.pct_social %></td>
-              <td data-value="<%= row.pct_referral %>"><%= row.pct_referral %></td>
-              <td data-value="<%= row.pct_other %>"><%= row.pct_other %></td>
-              <td data-value="<%= row.score_mobile %>"><%= row.score_mobile %></td>
-              <td data-value="<%= row.score_desktop %>"><%= row.score_desktop %></td>
-              <td data-value="<%= row.attacks_blocked %>"><%= row.attacks_blocked %></td>
-              <td data-value="<%= row.threats_count %>"><%= row.threats_count %></td>
+              <td<%- sourceTooltip(row.sources_used, 'clicks') %> data-value="<%= row.impressions %>"><%= row.impressions %></td>
+              <td<%- sourceTooltip(row.sources_used, 'clicks') %> data-value="<%= row.clicks %>"><%= row.clicks %></td>
+              <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.visits %>"><%= row.visits %></td>
+              <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_direct %>"><%= row.pct_direct %></td>
+              <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_organic %>"><%= row.pct_organic %></td>
+              <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_social %>"><%= row.pct_social %></td>
+              <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_referral %>"><%= row.pct_referral %></td>
+              <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_other %>"><%= row.pct_other %></td>
+              <td<%- sourceTooltip(row.sources_used, 'pagespeed') %> data-value="<%= row.score_mobile %>"><%= row.score_mobile %></td>
+              <td<%- sourceTooltip(row.sources_used, 'pagespeed') %> data-value="<%= row.score_desktop %>"><%= row.score_desktop %></td>
+              <td<%- sourceTooltip(row.sources_used, 'security') %> data-value="<%= row.attacks_blocked %>"><%= row.attacks_blocked %></td>
+              <td<%- sourceTooltip(row.sources_used, 'security') %> data-value="<%= row.threats_count %>"><%= row.threats_count %></td>
             </tr>
           <% }) %>
         </tbody>
@@ -103,13 +98,14 @@ function fmtDelta(value) {
 </div>
 
 <style>
-  /* Tooltips de cabecera (CSS puro, sin librerías): indican la fuente del dato en hover. */
-  th[data-tooltip] {
+  /* Tooltips de celda (CSS puro, sin librerías): indican qué herramienta se usó para ese
+     dato concreto en la generación de ese informe, y si tuvo éxito. */
+  td[data-tooltip] {
     position: relative;
     cursor: help;
   }
 
-  th[data-tooltip]::after {
+  td[data-tooltip]::after {
     content: attr(data-tooltip);
     position: absolute;
     top: 100%;
@@ -133,7 +129,7 @@ function fmtDelta(value) {
     z-index: 10;
   }
 
-  th[data-tooltip]:hover::after {
+  td[data-tooltip]:hover::after {
     opacity: 1;
     visibility: visible;
   }
