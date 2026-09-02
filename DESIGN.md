@@ -1,6 +1,6 @@
 # DESIGN.md — Faro
 
-> Sistema de diseño unificado de Faro, con dos temas: **noche** (marca elGriegoNET®, por defecto) y **día** (editorial, calma operativa). Este documento es la única fuente de verdad para ambos — sustituye a las versiones anteriores separadas `DESIGN.md` (oscuro) y `DESIGNdia.md` (claro).
+> Sistema de diseño unificado de Faro, con dos temas: **día** (editorial, calma operativa, por defecto) y **noche** (marca elGriegoNET®). Este documento es la única fuente de verdad para ambos — sustituye a las versiones anteriores separadas `DESIGN.md` (oscuro) y `DESIGNdia.md` (claro).
 
 ---
 
@@ -26,7 +26,7 @@ La interfaz es una **consola de operaciones**, no un panel de marketing. Limpia,
 - **Calma operativa.** Sin colores estridentes, sin alertas innecesarias. Los avisos se reservan solo para lo que realmente lo merece.
 - **Color con propósito, nunca decorativo.** Se usa solo para comunicar estado (verde = bien, ámbar = atención, rojo = acción requerida). Las pantallas en estado normal se ven mayoritariamente en blanco, gris cálido y negro.
 
-**Por defecto Faro arranca en tema oscuro** (`:root`, sin atributo); el tema claro se activa explícitamente vía `[data-theme="light"]` (ver §6).
+**Por defecto Faro arranca en tema claro** (`:root`, sin atributo `data-theme`); el tema oscuro se activa explícitamente vía `[data-theme="dark"]` (ver §6).
 
 ---
 
@@ -346,73 +346,8 @@ Ambos temas comparten: mensajes de error que explican qué falló y qué sigue s
 
 ```css
 :root {
-  /* ============ TEMA OSCURO (por defecto) ============ */
+  /* ============ TEMA CLARO (día) — predeterminado ============ */
 
-  /* Fondos */
-  --bg-app:           #0F000A;
-  --bg-panel:         #1A000F;
-  --bg-card:          #240018;
-  --bg-card-hover:    #2E001F;
-  --bg-input:         #1A000F;
-
-  /* Bordes */
-  --border-subtle:    #4A0035;
-  --border-strong:    #7A0058;
-
-  /* Marca */
-  --brand-primary:       #E91E8C;
-  --brand-primary-hover: #FF4DB8;
-  --brand-primary-dim:   #7A1050;
-  --brand-accent:        #FF9E00;
-  --brand-accent-hover:  #FFB833;
-
-  /* Estados */
-  --status-success: #00C896;
-  --status-warning: #FF9E00;
-  --status-error:   #FF3355;
-  --status-info:    #3DB8FF;
-  --status-neutral: #7A6A78;
-
-  /* Texto */
-  --text-primary:   #FFFFFF;
-  --text-secondary: #C8A8BF;
-  --text-muted:     #7A5A73;
-  --text-on-brand:  #FFFFFF;
-  --text-zero:      #4A3548;
-
-  /* Degradados */
-  --gradient-brand:   linear-gradient(135deg, #E91E8C 0%, #7B2FF7 100%);
-  --gradient-rainbow: linear-gradient(90deg, #FF0054, #FF4500, #FFB800, #00C896, #3DB8FF, #7B2FF7, #E91E8C);
-  --gradient-card:    linear-gradient(160deg, #240018 0%, #1A000F 100%);
-
-  /* Radios */
-  --radius-sm:   4px;
-  --radius-md:   8px;
-  --radius-lg:   12px;
-  --radius-xl:   16px;
-  --radius-pill: 999px; /* compartido; solo lo usa el badge en tema claro */
-
-  /* Espaciado */
-  --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-5:  20px;
-  --space-6:  24px;
-  --space-8:  32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px; /* compartido; principalmente usado en tema claro */
-  --space-20: 80px; /* compartido; principalmente usado en tema claro */
-
-  /* Tipografía */
-  --font-display: 'Bebas Neue', 'Impact', sans-serif;
-  --font-ui:      'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
-  --font-mono:    'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-}
-
-/* ============ TEMA CLARO — solo los tokens que cambian ============ */
-[data-theme="light"] {
   /* Fondos */
   --bg-app:        #FFFFFF;
   --bg-panel:      #F7F7F5;
@@ -451,14 +386,78 @@ Ambos temas comparten: mensajes de error que explican qué falló y qué sigue s
   --gradient-card:    linear-gradient(160deg, #FFFFFF 0%, #FFFFFF 100%);
 
   /* Radios */
-  --radius-sm: 6px;
-  --radius-md: 7px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
+  --radius-sm:   6px;
+  --radius-md:   7px;
+  --radius-lg:   10px;
+  --radius-xl:   12px;
+  --radius-pill: 999px; /* compartido; solo lo usa el badge en tema claro */
+
+  /* Espaciado */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px; /* compartido; principalmente usado en tema claro */
+  --space-20: 80px; /* compartido; principalmente usado en tema claro */
 
   /* Tipografía — una sola familia (Inter) para todo */
   --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-ui:      'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
   --font-mono:    'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
+}
+
+/* ============ TEMA OSCURO (noche) — solo los tokens que cambian ============ */
+[data-theme="dark"] {
+  /* Fondos */
+  --bg-app:           #0F000A;
+  --bg-panel:         #1A000F;
+  --bg-card:          #240018;
+  --bg-card-hover:    #2E001F;
+  --bg-input:         #1A000F;
+
+  /* Bordes */
+  --border-subtle:    #4A0035;
+  --border-strong:    #7A0058;
+
+  /* Marca */
+  --brand-primary:       #E91E8C;
+  --brand-primary-hover: #FF4DB8;
+  --brand-primary-dim:   #7A1050;
+  --brand-accent:        #FF9E00;
+  --brand-accent-hover:  #FFB833;
+
+  /* Estados */
+  --status-success: #00C896;
+  --status-warning: #FF9E00;
+  --status-error:   #FF3355;
+  --status-info:    #3DB8FF;
+  --status-neutral: #7A6A78;
+
+  /* Texto */
+  --text-primary:   #FFFFFF;
+  --text-secondary: #C8A8BF;
+  --text-muted:     #7A5A73;
+  --text-zero:      #4A3548;
+
+  /* Degradados */
+  --gradient-brand:   linear-gradient(135deg, #E91E8C 0%, #7B2FF7 100%);
+  --gradient-rainbow: linear-gradient(90deg, #FF0054, #FF4500, #FFB800, #00C896, #3DB8FF, #7B2FF7, #E91E8C);
+  --gradient-card:    linear-gradient(160deg, #240018 0%, #1A000F 100%);
+
+  /* Radios */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+
+  /* Tipografía */
+  --font-display: 'Bebas Neue', 'Impact', sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 }
 ```
 
@@ -473,8 +472,8 @@ Botón en la cabecera (`.header-bar`), junto al nombre de la app, que alterna `d
 ```html
 <header class="header-bar">
   <span class="app-title">FARO</span>
-  <button id="theme-toggle" class="btn-ghost" type="button" aria-label="Cambiar a tema claro" aria-pressed="false">
-    <i class="ph ph-moon" id="theme-toggle-icon" aria-hidden="true"></i>
+  <button id="theme-toggle" class="btn-ghost" type="button" aria-label="Cambiar tema">
+    <span id="theme-toggle-icon">🌙</span>
   </button>
 </header>
 ```
@@ -485,50 +484,43 @@ Debe ejecutarse de forma síncrona en `<head>`, antes de que se pinte el `<body>
 
 ```html
 <script>
-  (function () {
-    if (localStorage.getItem('faro-theme') === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  })();
+  const t = localStorage.getItem('faro-theme');
+  if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 </script>
 ```
 
 ### Lógica del botón (JS mínimo de cliente, sin framework)
 
 ```js
-function initThemeToggle() {
-  var root = document.documentElement;
-  var btn = document.getElementById('theme-toggle');
-  if (!btn) return;
+(function () {
+  const toggle = document.getElementById('theme-toggle');
+  const icon = document.getElementById('theme-toggle-icon');
 
-  function apply(theme) {
-    if (theme === 'light') {
-      root.setAttribute('data-theme', 'light');
-    } else {
-      root.removeAttribute('data-theme');
-    }
-    btn.setAttribute('aria-pressed', String(theme === 'light'));
-    btn.setAttribute('aria-label', theme === 'light' ? 'Cambiar a tema oscuro' : 'Cambiar a tema claro');
-    document.getElementById('theme-toggle-icon').className = theme === 'light' ? 'ph ph-sun' : 'ph ph-moon';
+  function updateIcon() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    icon.textContent = isDark ? '☀️' : '🌙';
   }
 
-  var current = localStorage.getItem('faro-theme') || 'dark';
-  apply(current);
+  updateIcon();
 
-  btn.addEventListener('click', function () {
-    current = current === 'light' ? 'dark' : 'light';
-    localStorage.setItem('faro-theme', current);
-    apply(current);
+  toggle.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('faro-theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('faro-theme', 'dark');
+    }
+    updateIcon();
   });
-}
-
-document.addEventListener('DOMContentLoaded', initThemeToggle);
+})();
 ```
 
-**Notas de implementación** (para cuando se traslade este componente al código, fuera del alcance de este documento):
+**Notas de implementación** (el componente ya está implementado en `src/views/layout.ejs`):
 - El snippet de `<head>` iría en `src/views/layout.ejs`, antes del `<link rel="stylesheet" href="/style.css">`.
-- `initThemeToggle()` iría en `public/app.js`, junto al resto de JS mínimo de cliente (Principio I de la Constitución: sin framework, sin dependencia añadida — usa solo `localStorage` y el DOM).
-- Sin tema guardado, Faro arranca en oscuro (`current = 'dark'` por defecto), coherente con que `:root` ya es el tema oscuro sin necesidad de atributo.
+- El script del final de `<body>` va inline en `layout.ejs`, junto al markup del botón (no en `public/app.js`), sin framework ni dependencia añadida (Principio I de la Constitución) — usa solo `localStorage` y el DOM.
+- Sin tema guardado, Faro arranca en claro (sin atributo `data-theme`), coherente con que `:root` ya es el tema claro por defecto; el tema oscuro requiere `data-theme="dark"` explícito.
 
 ---
 
