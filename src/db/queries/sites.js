@@ -51,6 +51,14 @@ async function setSheetsId(id, sheetsId) {
   await pool.query(`UPDATE sites SET sheets_id = $1 WHERE id = $2`, [sheetsId, id]);
 }
 
+async function getLastReportDate(siteId) {
+  const { rows } = await pool.query(
+    `SELECT created_at FROM monthly_records WHERE site_id = $1 ORDER BY created_at DESC LIMIT 1`,
+    [siteId]
+  );
+  return rows[0] ? rows[0].created_at : null;
+}
+
 module.exports = {
   getAllActiveSites,
   getAllSites,
@@ -58,4 +66,5 @@ module.exports = {
   createSite,
   deactivateSite,
   setSheetsId,
+  getLastReportDate,
 };

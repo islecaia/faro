@@ -6,7 +6,13 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
   try {
     const sites = await sitesQueries.getAllActiveSites();
-    await res.renderPage('sites/index', { screenHeading: 'Sitios', sites });
+    const sitesWithLastReport = await Promise.all(
+      sites.map(async (site) => ({
+        ...site,
+        last_report_date: await sitesQueries.getLastReportDate(site.id),
+      }))
+    );
+    await res.renderPage('sites/index', { screenHeading: 'Sitios', sites: sitesWithLastReport });
   } catch (err) {
     next(err);
   }

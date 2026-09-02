@@ -1,3 +1,12 @@
+<%
+function fmtDateTime(date) {
+  if (!date) return '—';
+  const d = new Date(date);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+%>
+
 <div style="display:flex; align-items:center; justify-content:space-between;">
   <h1 class="screen-heading">Sitios</h1>
   <a href="/sites/new" class="btn btn-primary"><i class="ph ph-plus"></i> Añadir sitio</a>
@@ -17,6 +26,7 @@
           <th>URL</th>
           <th>Email cliente</th>
           <th>Estado</th>
+          <th>Último informe</th>
           <th></th>
         </tr>
       </thead>
@@ -27,6 +37,7 @@
             <td><%= site.url %></td>
             <td><%= site.client_email %></td>
             <td><span class="badge badge-conectado">ACTIVO</span></td>
+            <td style="font-family: var(--font-mono);"><%= fmtDateTime(site.last_report_date) %></td>
             <td style="text-align:right;">
               <a href="/reports/generate/<%= site.id %>" class="btn btn-secondary">Generar informe</a>
               <form action="/sites/<%= site.id %>/deactivate" method="post" style="display:inline;">
