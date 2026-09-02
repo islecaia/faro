@@ -2,7 +2,80 @@
 
 <div class="card">
   <p class="caption">Se recogerán los datos del mes anterior desde las 5 fuentes configuradas del sitio.</p>
-  <form action="/reports/generate/<%= site.id %>" method="post">
-    <button type="submit" class="btn btn-primary"><i class="ph ph-play"></i> Generar informe</button>
+
+  <form id="generate-form" action="/reports/generate/<%= site.id %>" method="post">
+    <button type="submit" id="generate-btn" class="btn btn-primary">
+      <i class="ph ph-play"></i> <span id="generate-btn-label">Generar informe</span>
+    </button>
   </form>
+
+  <div id="generate-feedback" style="margin-top: var(--space-4);"></div>
 </div>
+
+<style>
+  .btn-spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    vertical-align: -2px;
+    animation: generate-btn-spin 700ms linear infinite;
+  }
+  @keyframes generate-btn-spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<script>
+  (function () {
+    var form = document.getElementById('generate-form');
+    var btn = document.getElementById('generate-btn');
+    var feedback = document.getElementById('generate-feedback');
+    if (!form || !btn) return;
+
+    var originalHtml = btn.innerHTML;
+
+    function showError(message) {
+      feedback.innerHTML = '';
+      var alert = document.createElement('div');
+      alert.className = 'alert alert-error';
+      var icon = document.createElement('i');
+      icon.className = 'ph ph-warning-circle';
+      var text = document.createElement('div');
+      text.textContent = message;
+      alert.appendChild(icon);
+      alert.appendChild(text);
+      feedback.appendChild(alert);
+    }
+
+    // El resultado de éxito (incluidos los errores parciales de fuente, que nunca bloquean
+    // la generación) ya se muestra en /reports/:record_id — ver reports/detail.ejs. Aquí solo
+    // gestionamos el estado de "trabajando" del botón y el caso en que la petición en sí falla.
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      feedback.innerHTML = '';
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner"></span> Generando…';
+
+      fetch(form.action, { method: 'POST' })
+        .then(function (response) {
+          if (response.ok) {
+            window.location.href = response.url;
+            return;
+          }
+          throw new Error('No se pudo generar el informe. Inténtalo de nuevo.');
+        })
+        .catch(function (err) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+          showError(
+            err instanceof TypeError
+              ? 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.'
+              : err.message
+          );
+        });
+    });
+  })();
+</script>
