@@ -62,9 +62,19 @@ function fmtDelta(value) {
       <table>
         <thead>
           <tr>
-            <th>Sitio</th><th>Fecha</th><th>Impresiones</th><th>Clics</th><th>Visitas</th>
-            <th>% Directo</th><th>% Orgánico</th><th>% Social</th><th>% Referral</th><th>% Otro</th>
-            <th>PS Mobile</th><th>PS Desktop</th><th>Ataques</th><th>Amenazas</th>
+            <th>Sitio</th><th>Fecha</th>
+            <th data-tooltip="Google Search Console">Impresiones</th>
+            <th data-tooltip="Google Search Console">Clics</th>
+            <th data-tooltip="Google Analytics 4">Visitas</th>
+            <th data-tooltip="Google Analytics 4">% Directo</th>
+            <th data-tooltip="Google Analytics 4">% Orgánico</th>
+            <th data-tooltip="Google Analytics 4">% Social</th>
+            <th data-tooltip="Google Analytics 4">% Referral</th>
+            <th data-tooltip="Google Analytics 4">% Otro</th>
+            <th data-tooltip="Google PageSpeed Insights">PS Mobile</th>
+            <th data-tooltip="Google PageSpeed Insights">PS Desktop</th>
+            <th data-tooltip="Security Ninja">Ataques</th>
+            <th data-tooltip="Security Ninja">Amenazas</th>
           </tr>
         </thead>
         <tbody>
@@ -91,6 +101,43 @@ function fmtDelta(value) {
     </div>
   <% } %>
 </div>
+
+<style>
+  /* Tooltips de cabecera (CSS puro, sin librerías): indican la fuente del dato en hover. */
+  th[data-tooltip] {
+    position: relative;
+    cursor: help;
+  }
+
+  th[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    white-space: nowrap;
+    padding: 6px 10px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 150ms ease;
+    z-index: 10;
+  }
+
+  th[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+  }
+</style>
 
 <div>
   <p class="section-label">Oportunidades SEO</p>
