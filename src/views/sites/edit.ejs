@@ -1,0 +1,51 @@
+<%
+const sourceOptions = [
+  '', 'Google Site Kit', 'Squirrly SEO', 'Google Rankings', 'Rybbit',
+  'Ubersuggest', 'PageSpeed Insights', 'Security Ninja',
+];
+function renderSourceSelect(name, label, selectedValue) {
+  const options = sourceOptions.map((opt) => {
+    const optLabel = opt === '' ? '— Sin configurar —' : opt;
+    const selected = opt === (selectedValue || '') ? ' selected' : '';
+    return `<option value="${opt}"${selected}>${optLabel}</option>`;
+  }).join('');
+  return `
+    <div class="field">
+      <label for="${name}">${label}</label>
+      <select id="${name}" name="${name}">${options}</select>
+    </div>`;
+}
+const sourcesConfig = site.sources_config || {};
+%>
+
+<h1 class="screen-heading">Editar sitio</h1>
+
+<form action="/sites/<%= site.id %>/edit" method="post" class="form-grid">
+  <div class="field">
+    <label for="name">Nombre del sitio / cliente</label>
+    <input type="text" id="name" name="name" value="<%= site.name %>" required>
+  </div>
+
+  <div class="field">
+    <label for="url">URL</label>
+    <input type="url" id="url" name="url" value="<%= site.url %>" placeholder="https://ejemplo.com" required>
+  </div>
+
+  <div class="field">
+    <label for="client_email">Email del cliente</label>
+    <input type="email" id="client_email" name="client_email" value="<%= site.client_email %>" required>
+  </div>
+
+  <p class="section-label">Fuentes de datos</p>
+
+  <%- renderSourceSelect('source_clicks', 'Fuente de impresiones/clics', sourcesConfig.clicks) %>
+  <%- renderSourceSelect('source_visits', 'Fuente de visitas', sourcesConfig.visits) %>
+  <%- renderSourceSelect('source_keywords', 'Fuente de keywords', sourcesConfig.keywords) %>
+  <%- renderSourceSelect('source_pagespeed', 'Fuente de rendimiento', sourcesConfig.pagespeed) %>
+  <%- renderSourceSelect('source_security', 'Fuente de seguridad', sourcesConfig.security) %>
+
+  <div>
+    <button type="submit" class="btn btn-primary"><i class="ph ph-check"></i> Guardar cambios</button>
+    <a href="/sites/<%= site.id %>" class="btn btn-ghost">Cancelar</a>
+  </div>
+</form>

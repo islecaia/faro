@@ -43,6 +43,14 @@ async function createSite(data) {
   return rows[0];
 }
 
+async function updateSite(id, { name, url, clientEmail, sourcesConfig }) {
+  const { rows } = await pool.query(
+    `UPDATE sites SET name = $1, url = $2, client_email = $3, sources_config = $4 WHERE id = $5 RETURNING *`,
+    [name, url, clientEmail, JSON.stringify(sourcesConfig || {}), id]
+  );
+  return rows[0];
+}
+
 async function deactivateSite(id) {
   await pool.query(`UPDATE sites SET status = 'inactive' WHERE id = $1`, [id]);
 }
@@ -64,6 +72,7 @@ module.exports = {
   getAllSites,
   getSiteById,
   createSite,
+  updateSite,
   deactivateSite,
   setSheetsId,
   getLastReportDate,
