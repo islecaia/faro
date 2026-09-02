@@ -81,7 +81,7 @@ function rowBorderColor(row) {
     <div class="card empty-state">No hay registros históricos todavía. Genera el primer informe de un sitio para empezar.</div>
   <% } else { %>
     <div class="table-wrap">
-      <table>
+      <table id="historical-table">
         <thead>
           <tr>
             <th>Sitio</th><th>Fecha</th><th>Impresiones</th><th>Clics</th><th>Visitas</th>
@@ -150,6 +150,22 @@ function rowBorderColor(row) {
     opacity: 1;
     visibility: visible;
   }
+
+  /* Selección de fila en la tabla de histórico: fondo distinto + borde izquierdo más grueso. */
+  #historical-table tbody tr {
+    cursor: pointer;
+  }
+
+  #historical-table tbody tr.row-selected td {
+    background: var(--bg-panel);
+  }
+
+  /* El color y el ancho base del borde vienen de un style inline por fila (color de sitio /
+     error); !important es necesario para que el grosor de selección gane sobre ese inline
+     sin tener que recalcular ni repetir el color aquí. */
+  #historical-table tbody tr.row-selected td:first-child {
+    border-left-width: 5px !important;
+  }
 </style>
 
 <div>
@@ -168,3 +184,18 @@ function rowBorderColor(row) {
     </div>
   <% } %>
 </div>
+
+<script>
+  (function () {
+    var rows = document.querySelectorAll('#historical-table tbody tr');
+    rows.forEach(function (row) {
+      row.addEventListener('click', function () {
+        var wasSelected = row.classList.contains('row-selected');
+        rows.forEach(function (r) { r.classList.remove('row-selected'); });
+        if (!wasSelected) {
+          row.classList.add('row-selected');
+        }
+      });
+    });
+  })();
+</script>
