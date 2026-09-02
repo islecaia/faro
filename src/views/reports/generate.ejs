@@ -1,0 +1,8 @@
+<h1 class="screen-heading">Generar informe — <%= site.name %></h1>
+
+<div class="card">
+  <p class="caption">Se recogerán los datos del mes anterior desde las 5 fuentes configuradas del sitio.</p>
+  <form action="/reports/generate/<%= site.id %>" method="post">
+    <button type="submit" class="btn btn-primary"><i class="ph ph-play"></i> Generar informe</button>
+  </form>
+</div>

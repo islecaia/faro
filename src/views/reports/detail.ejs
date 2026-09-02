@@ -1,0 +1,73 @@
+<%
+const sourceLabels = {
+  search_console: 'Search Console',
+  analytics: 'GA4 Analytics',
+  keywords: 'Palabras clave',
+  pagespeed: 'PageSpeed',
+  security: 'Security Ninja',
+};
+const statuses = record.sources_status || {};
+const hasFailure = Object.values(statuses).includes('failed');
+%>
+
+<h1 class="screen-heading">
+  <%= site.name %> — <%= new Date(record.period).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }) %>
+</h1>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-card-label section-label"><i class="ph ph-eye"></i> IMPRESIONES</div>
+    <div class="kpi-card-value" data-value="<%= record.impressions %>"><%= record.impressions %></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-card-label section-label"><i class="ph ph-cursor-click"></i> CLICS</div>
+    <div class="kpi-card-value" data-value="<%= record.clicks %>"><%= record.clicks %></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-card-label section-label"><i class="ph ph-users"></i> VISITAS</div>
+    <div class="kpi-card-value" data-value="<%= record.visits %>"><%= record.visits %></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-card-label section-label"><i class="ph ph-gauge"></i> RENDIMIENTO</div>
+    <div class="kpi-card-value">M <%= record.score_mobile %> / D <%= record.score_desktop %></div>
+  </div>
+</div>
+
+<% if (typeof justGenerated !== 'undefined' && justGenerated) { %>
+  <div class="alert alert-success">
+    <i class="ph ph-check-circle"></i>
+    <div>Informe de <%= new Date(record.period).toLocaleDateString('es-ES', { month: 'long' }) %> generado correctamente. <%= connectedCount %>/<%= totalSources %> fuentes conectadas.</div>
+  </div>
+<% } %>
+
+<% if (typeof justSent !== 'undefined' && justSent) { %>
+  <div class="alert alert-success">
+    <i class="ph ph-check-circle"></i>
+    <div>Informe enviado correctamente a <%= site.client_email %><%= record.email_sent_at ? '.' : '' %></div>
+  </div>
+<% } %>
+
+<% if (hasFailure) { %>
+  <div class="alert alert-error">
+    <i class="ph ph-warning-circle"></i>
+    <div>Alguna fuente no respondió tras 3 reintentos. Se ha notificado por email. El resto del informe está completo.</div>
+  </div>
+<% } %>
+
+<div class="card">
+  <p class="section-label">Estado de las fuentes</p>
+  <div style="display:flex; gap: var(--space-2); flex-wrap: wrap;">
+    <% Object.entries(statuses).forEach(([source, status]) => { %>
+      <span class="badge <%= status === 'ok' ? 'badge-conectado' : 'badge-fallido' %>">
+        <%= sourceLabels[source] || source %>: <%= status === 'ok' ? 'CONECTADO' : 'FALLIDO' %>
+      </span>
+    <% }) %>
+  </div>
+</div>
+
+<div>
+  <a href="/email-form/<%= record.id %>" class="btn btn-primary">Ir al formulario de informe de cliente</a>
+  <% if (site.sheets_id) { %>
+    <a href="/sheets/<%= site.id %>/open" target="_blank" class="btn btn-secondary"><i class="ph ph-table"></i> Ver en Google Sheets</a>
+  <% } %>
+</div>

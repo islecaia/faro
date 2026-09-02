@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof screenHeading !== 'undefined' ? screenHeading + ' · Faro' : 'Faro' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="/" class="<%= path === '/' ? 'active' : '' %>"><i class="ph ph-house"></i> Inicio</a>
+        <a href="/sites" class="<%= path && path.startsWith('/sites') ? 'active' : '' %>"><i class="ph ph-globe"></i> Sitios</a>
+      </nav>
+    </aside>
+    <div class="main-column">
+      <header class="header-bar">
+        <span class="app-title">FARO</span>
+      </header>
+      <main class="content">
+        <%- body %>
+      </main>
+    </div>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

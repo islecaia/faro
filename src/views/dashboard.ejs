@@ -1,0 +1,110 @@
+<%
+function fmtDelta(value) {
+  if (value === null || value === undefined) return '';
+  const arrow = value >= 0 ? '▲' : '▼';
+  const cls = value >= 0 ? 'positive' : 'negative';
+  return `<div class="kpi-card-delta ${cls}">${arrow} ${Math.abs(value)}% vs mes anterior</div>`;
+}
+%>
+
+<div style="display:flex; align-items:center; justify-content:space-between;">
+  <h1 class="screen-heading">Dashboard</h1>
+  <form method="get" id="site-filter-form">
+    <select name="site_id" id="site-filter">
+      <option value="">Todos los sitios</option>
+      <% sites.forEach(site => { %>
+        <option value="<%= site.id %>" <%= String(selectedSiteId) === String(site.id) ? 'selected' : '' %>>
+          <%= site.name %><%= site.status === 'inactive' ? ' (baja)' : '' %>
+        </option>
+      <% }) %>
+    </select>
+  </form>
+</div>
+
+<% if (!kpis.length) { %>
+  <div class="card empty-state">
+    Aún no hay registros para este sitio.<br>
+    Genera el primer informe mensual para empezar el histórico.
+  </div>
+<% } else { %>
+  <div class="kpi-grid">
+    <% kpis.forEach(kpi => { %>
+      <div class="kpi-card">
+        <div class="kpi-card-label section-label"><i class="ph ph-eye"></i> <%= kpi.site_name %> — IMPRESIONES</div>
+        <div class="kpi-card-value" data-value="<%= kpi.impressions %>"><%= kpi.impressions %></div>
+        <%- fmtDelta(kpi.delta_impressions) %>
+        <div class="caption"><%= new Date(kpi.period).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) %></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-label section-label"><i class="ph ph-cursor-click"></i> <%= kpi.site_name %> — CLICS</div>
+        <div class="kpi-card-value" data-value="<%= kpi.clicks %>"><%= kpi.clicks %></div>
+        <%- fmtDelta(kpi.delta_clicks) %>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-label section-label"><i class="ph ph-users"></i> <%= kpi.site_name %> — VISITAS</div>
+        <div class="kpi-card-value" data-value="<%= kpi.visits %>"><%= kpi.visits %></div>
+        <%- fmtDelta(kpi.delta_visits) %>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-label section-label"><i class="ph ph-gauge"></i> <%= kpi.site_name %> — PAGESPEED</div>
+        <div class="kpi-card-value">M <%= kpi.score_mobile %> / D <%= kpi.score_desktop %></div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<div>
+  <p class="section-label">Histórico de registros</p>
+  <% if (!historical.length) { %>
+    <div class="card empty-state">No hay registros históricos todavía. Genera el primer informe de un sitio para empezar.</div>
+  <% } else { %>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Sitio</th><th>Fecha</th><th>Impresiones</th><th>Clics</th><th>Visitas</th>
+            <th>% Directo</th><th>% Orgánico</th><th>% Social</th><th>% Referral</th><th>% Otro</th>
+            <th>PS Mobile</th><th>PS Desktop</th><th>Ataques</th><th>Amenazas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% historical.forEach(row => { %>
+            <tr class="<%= Object.values(row.sources_status || {}).includes('failed') ? 'row-error' : '' %>">
+              <td style="font-family: var(--font-ui);"><%= row.site_name %></td>
+              <td><%= new Date(row.period).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) %></td>
+              <td data-value="<%= row.impressions %>"><%= row.impressions %></td>
+              <td data-value="<%= row.clicks %>"><%= row.clicks %></td>
+              <td data-value="<%= row.visits %>"><%= row.visits %></td>
+              <td data-value="<%= row.pct_direct %>"><%= row.pct_direct %></td>
+              <td data-value="<%= row.pct_organic %>"><%= row.pct_organic %></td>
+              <td data-value="<%= row.pct_social %>"><%= row.pct_social %></td>
+              <td data-value="<%= row.pct_referral %>"><%= row.pct_referral %></td>
+              <td data-value="<%= row.pct_other %>"><%= row.pct_other %></td>
+              <td data-value="<%= row.score_mobile %>"><%= row.score_mobile %></td>
+              <td data-value="<%= row.score_desktop %>"><%= row.score_desktop %></td>
+              <td data-value="<%= row.attacks_blocked %>"><%= row.attacks_blocked %></td>
+              <td data-value="<%= row.threats_count %>"><%= row.threats_count %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<div>
+  <p class="section-label">Oportunidades SEO</p>
+  <% if (!opportunities.length) { %>
+    <div class="card empty-state">No hay palabras clave en posición 4–10 en este momento.</div>
+  <% } else { %>
+    <div class="card" style="display:flex; flex-direction:column; gap: var(--space-2);">
+      <% opportunities.forEach(kw => { %>
+        <div style="display:flex; align-items:center; gap: var(--space-3);">
+          <span class="badge badge-oportunidad">OPORTUNIDAD</span>
+          <span style="font-family: var(--font-mono);"><%= kw.keyword %></span>
+          <span class="caption"><%= kw.site_name %> · posición <%= kw.position %><%= kw.search_volume ? ' · ' + kw.search_volume + ' búsquedas/mes' : '' %></span>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>

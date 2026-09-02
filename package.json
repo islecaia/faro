@@ -1,0 +1,29 @@
+{
+  "name": "faro",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/islecaia/faro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/islecaia/faro/issues"
+  },
+  "homepage": "https://github.com/islecaia/faro#readme",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^4.22.2",
+    "googleapis": "^178.0.0",
+    "nodemailer": "^9.1.1",
+    "pg": "^8.23.0"
+  }
+}
