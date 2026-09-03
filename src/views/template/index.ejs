@@ -76,9 +76,10 @@ const variables = [
       },
     });
 
-    // Carga inicial si hay body.
+    // Carga inicial si hay body. innerHTML directo (no dangerouslyPasteHTML) para preservar
+    // el HTML exacto: pasar por Delta y de vuelta a HTML pierde estilos inline entre guardados.
     var initialBody = <%- JSON.stringify(body || '') %>;
-    if (initialBody) quill.clipboard.dangerouslyPasteHTML(0, initialBody);
+    if (initialBody) quill.root.innerHTML = initialBody;
 
     document.querySelectorAll('.template-var-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
