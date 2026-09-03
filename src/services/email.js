@@ -17,6 +17,16 @@ const METRIC_LABELS = {
   attacks_blocked: 'Los ataques bloqueados',
 };
 
+// Escala oficial de calificación PageSpeed: 0-49 malo, 50-74 mejorable, 75-89 bueno, 90-100 excelente.
+// Se usa como respaldo cuando no llega una calificación ya elegida (rating_mobile/rating_desktop).
+function pageSpeedRating(score) {
+  const value = Number(score);
+  if (value >= 90) return 'excelente';
+  if (value >= 75) return 'bueno';
+  if (value >= 50) return 'mejorable';
+  return 'malo';
+}
+
 // La API key de Resend y el remitente se configuran en /sources (source_key='smtp',
 // campos resend_api_key y from) — sin fallback a variables de entorno.
 async function resolveEmailConfig() {
@@ -80,8 +90,8 @@ function renderReportHtml(d) {
     ${[d.opportunity_1, d.opportunity_2, d.opportunity_3].filter(Boolean).length
       ? `<p><strong>Oportunidades identificadas:</strong><br>${[d.opportunity_1, d.opportunity_2, d.opportunity_3].filter(Boolean).join('<br>')}</p>`
       : ''}
-    Rendimiento técnico — Mobile: ${d.score_mobile} (${d.rating_mobile || '—'})<br>
-    Rendimiento técnico — Desktop: ${d.score_desktop} (${d.rating_desktop || '—'})
+    Rendimiento técnico — Mobile: ${d.score_mobile} (${d.rating_mobile || pageSpeedRating(d.score_mobile)})<br>
+    Rendimiento técnico — Desktop: ${d.score_desktop} (${d.rating_desktop || pageSpeedRating(d.score_desktop)})
   `);
 
   return `
@@ -115,8 +125,8 @@ function renderComposedReportHtml(d) {
       ${row('RSS', `${d.channel_rss ?? 0}%`)}
       ${row('Referrals', `${d.channel_referrals ?? 0}%`)}
       ${row('Other', `${d.channel_other ?? 0}%`)}
-      ${row('Rendimiento Móvil', `${d.score_mobile ?? 0}/100 (${d.rating_mobile || '—'})`)}
-      ${row('Rendimiento Desktop', `${d.score_desktop ?? 0}/100 (${d.rating_desktop || '—'})`)}
+      ${row('Rendimiento Móvil', `${d.score_mobile ?? 0}/100 (${d.rating_mobile || pageSpeedRating(d.score_mobile)})`)}
+      ${row('Rendimiento Desktop', `${d.score_desktop ?? 0}/100 (${d.rating_desktop || pageSpeedRating(d.score_desktop)})`)}
     </table>`;
 
   const section = (title, body) => `
