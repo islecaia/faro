@@ -1,0 +1,124 @@
+<h1 class="screen-heading">Componer informe — <%= site.name %></h1>
+
+<% if (justSent) { %>
+  <div class="alert alert-success">
+    <i class="ph ph-check-circle"></i>
+    <div>Informe enviado correctamente a <%= site.client_email %>.</div>
+  </div>
+<% } %>
+
+<% if (justError) { %>
+  <div class="alert alert-error">
+    <i class="ph ph-warning-circle"></i>
+    <div>No se pudo enviar el informe. Revisa la configuración SMTP e inténtalo de nuevo.</div>
+  </div>
+<% } %>
+
+<form action="/reports/<%= record.id %>/send" method="post" class="form-grid">
+  <p class="section-label">Cabecera</p>
+  <div class="field">
+    <label for="recipient_email">Email destinatario</label>
+    <input type="email" id="recipient_email" name="recipient_email" value="<%= site.client_email %>" required>
+  </div>
+
+  <p class="section-label">Tráfico — Impresiones</p>
+  <div class="field">
+    <label for="impressions">Impresiones del mes</label>
+    <input type="number" id="impressions" name="impressions" value="<%= record.impressions %>">
+  </div>
+  <div class="field">
+    <label for="impressions_variation">% variación vs mes anterior</label>
+    <input type="text" id="impressions_variation" name="impressions_variation" value="<%= impressionsVariation %>" placeholder="+22">
+  </div>
+
+  <p class="section-label">Tráfico — Clics</p>
+  <div class="field">
+    <label for="clicks">Clics del mes</label>
+    <input type="number" id="clicks" name="clicks" value="<%= record.clicks %>">
+  </div>
+  <div class="field">
+    <label for="clicks_variation">% variación vs mes anterior</label>
+    <input type="text" id="clicks_variation" name="clicks_variation" value="<%= clicksVariation %>" placeholder="-5">
+  </div>
+
+  <p class="section-label">Canales</p>
+  <div class="field"><label for="channel_direct">Direct (%)</label><input type="number" step="0.01" id="channel_direct" name="channel_direct" value="<%= record.pct_direct %>"></div>
+  <div class="field"><label for="channel_organic">Organic Search (%)</label><input type="number" step="0.01" id="channel_organic" name="channel_organic" value="<%= record.pct_organic %>"></div>
+  <div class="field"><label for="channel_rss">RSS (%)</label><input type="number" step="0.01" id="channel_rss" name="channel_rss" value="<%= record.pct_social %>"></div>
+  <div class="field"><label for="channel_referrals">Referrals (%)</label><input type="number" step="0.01" id="channel_referrals" name="channel_referrals" value="<%= record.pct_referral %>"></div>
+  <div class="field"><label for="channel_other">Other (%)</label><input type="number" step="0.01" id="channel_other" name="channel_other" value="<%= record.pct_other %>"></div>
+
+  <p class="section-label">Ranking</p>
+  <div class="field">
+    <label for="ranking_current">Ranking actual</label>
+    <input type="text" id="ranking_current" name="ranking_current" placeholder="p. ej. posición media 8">
+  </div>
+  <div class="field">
+    <label for="ranking_evolution">Evolución vs mes anterior</label>
+    <select id="ranking_evolution" name="ranking_evolution">
+      <option value="Mejorando gradualmente">Mejorando gradualmente</option>
+      <option value="Bajando ligeramente">Bajando ligeramente</option>
+      <option value="Manteniéndose estable">Manteniéndose estable</option>
+    </select>
+  </div>
+
+  <p class="section-label">Rendimiento técnico — Móvil</p>
+  <div class="field"><label for="score_mobile">Puntuación (sobre 100)</label><input type="number" id="score_mobile" name="score_mobile" value="<%= record.score_mobile %>"></div>
+  <div class="field">
+    <label for="rating_mobile">Calificación</label>
+    <select id="rating_mobile" name="rating_mobile">
+      <option value="malo">Malo</option><option value="mejorable">Mejorable</option>
+      <option value="bueno">Bueno</option><option value="excelente">Excelente</option>
+    </select>
+  </div>
+
+  <p class="section-label">Rendimiento técnico — Desktop</p>
+  <div class="field"><label for="score_desktop">Puntuación (sobre 100)</label><input type="number" id="score_desktop" name="score_desktop" value="<%= record.score_desktop %>"></div>
+  <div class="field">
+    <label for="rating_desktop">Calificación</label>
+    <select id="rating_desktop" name="rating_desktop">
+      <option value="malo">Malo</option><option value="mejorable">Mejorable</option>
+      <option value="bueno">Bueno</option><option value="excelente">Excelente</option>
+    </select>
+  </div>
+
+  <p class="section-label">Oportunidades identificadas</p>
+  <div class="field"><label for="opportunity_1">Oportunidad 1</label><input type="text" id="opportunity_1" name="opportunity_1"></div>
+  <div class="field"><label for="opportunity_2">Oportunidad 2</label><input type="text" id="opportunity_2" name="opportunity_2"></div>
+  <div class="field"><label for="opportunity_3">Oportunidad 3</label><input type="text" id="opportunity_3" name="opportunity_3"></div>
+
+  <p class="section-label">Incidencias resueltas</p>
+  <div class="field">
+    <label for="incidents_resolved">Incidencias resueltas este mes</label>
+    <textarea id="incidents_resolved" name="incidents_resolved" rows="3"></textarea>
+  </div>
+
+  <p class="section-label">Próximos pasos y recomendaciones</p>
+  <div class="field">
+    <label for="next_steps">Próximos pasos</label>
+    <textarea id="next_steps" name="next_steps" rows="3"></textarea>
+  </div>
+  <div class="field"><label for="recommendation_1">Recomendación 1</label><input type="text" id="recommendation_1" name="recommendation_1"></div>
+  <div class="field"><label for="recommendation_2">Recomendación 2</label><input type="text" id="recommendation_2" name="recommendation_2"></div>
+  <div class="field"><label for="recommendation_3">Recomendación 3</label><input type="text" id="recommendation_3" name="recommendation_3"></div>
+
+  <p class="section-label">Mensaje adicional</p>
+  <div class="field">
+    <label for="additional_message">Mensaje adicional para el cliente</label>
+    <textarea id="additional_message" name="additional_message" rows="3"></textarea>
+  </div>
+
+  <div class="field" style="flex-direction: row; align-items: center; gap: var(--space-2);">
+    <input type="checkbox" id="consent_updates" name="consent_updates" value="1" style="width:auto;">
+    <label for="consent_updates" style="text-transform:none; letter-spacing:normal;">Acepto recibir mi guía y comunicaciones de valor</label>
+  </div>
+  <div class="field" style="flex-direction: row; align-items: center; gap: var(--space-2);">
+    <input type="checkbox" id="consent_privacy" name="consent_privacy" value="1" style="width:auto;">
+    <label for="consent_privacy" style="text-transform:none; letter-spacing:normal;">Acepto la Política de Privacidad y Términos</label>
+  </div>
+
+  <div>
+    <button type="submit" class="btn btn-primary"><i class="ph ph-envelope"></i> Enviar</button>
+    <a href="/reports/<%= record.id %>" class="btn btn-ghost">Cancelar</a>
+  </div>
+</form>

@@ -16,16 +16,19 @@ function rowBorderColor(row) {
 
 <div style="display:flex; align-items:center; justify-content:space-between;">
   <h1 class="screen-heading">Dashboard</h1>
-  <form method="get" id="site-filter-form">
-    <select name="site_id" id="site-filter">
-      <option value="">Todos los sitios</option>
-      <% sites.forEach(site => { %>
-        <option value="<%= site.id %>" <%= String(selectedSiteId) === String(site.id) ? 'selected' : '' %>>
-          <%= site.name %><%= site.status === 'inactive' ? ' (baja)' : '' %>
-        </option>
-      <% }) %>
-    </select>
-  </form>
+  <div style="display:flex; align-items:center; gap: var(--space-3);">
+    <form method="get" id="site-filter-form">
+      <select name="site_id" id="site-filter">
+        <option value="">Todos los sitios</option>
+        <% sites.forEach(site => { %>
+          <option value="<%= site.id %>" <%= String(selectedSiteId) === String(site.id) ? 'selected' : '' %>>
+            <%= site.name %><%= site.status === 'inactive' ? ' (baja)' : '' %>
+          </option>
+        <% }) %>
+      </select>
+    </form>
+    <a id="btn-compose" href="#" class="btn btn-primary" hidden>Componer informe</a>
+  </div>
 </div>
 
 <% if (!historical.length) { %>
@@ -76,7 +79,7 @@ function rowBorderColor(row) {
         </thead>
         <tbody>
           <% historical.forEach(row => { %>
-            <tr class="<%= Object.values(row.sources_status || {}).includes('failed') ? 'row-error' : '' %>">
+            <tr data-record-id="<%= row.id %>" class="<%= Object.values(row.sources_status || {}).includes('failed') ? 'row-error' : '' %>">
               <% const borderColor = rowBorderColor(row); %>
               <td style="font-family: var(--font-ui);<%= borderColor ? ` border-left: 3px solid ${borderColor};` : '' %>"><%= row.site_name %></td>
               <td><%= new Date(row.period).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
@@ -189,6 +192,12 @@ function rowBorderColor(row) {
         target.textContent = td.getAttribute('data-value');
       }
     });
+
+    var composeBtn = document.getElementById('btn-compose');
+    if (composeBtn && tr.dataset.recordId) {
+      composeBtn.href = '/reports/' + tr.dataset.recordId + '/compose';
+      composeBtn.hidden = false;
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function () {

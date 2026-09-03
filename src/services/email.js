@@ -96,6 +96,85 @@ async function sendReport(clientEmail, data) {
   });
 }
 
+// Plantilla del informe "compuesto" (formulario libre de dashboard → /reports/:id/compose):
+// tabla de métricas + secciones cualitativas de texto libre, mismo lenguaje visual que el
+// informe de cliente estándar (renderReportHtml) para que ambos emails se vean coherentes.
+function renderComposedReportHtml(d) {
+  const row = (label, value) => `
+    <tr>
+      <td style="padding:8px 12px; color:#C8A8BF; font-family:Arial,sans-serif; font-size:13px; border-bottom:1px solid #4A0035;">${label}</td>
+      <td style="padding:8px 12px; color:#FFFFFF; font-family:Arial,sans-serif; font-size:13px; border-bottom:1px solid #4A0035;">${value}</td>
+    </tr>`;
+
+  const metricsTable = `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px; background:#240018; border-radius:8px; overflow:hidden;">
+      ${row('Impresiones', variationText(d.impressions, d.impressions_variation))}
+      ${row('Clics', variationText(d.clicks, d.clicks_variation))}
+      ${row('Direct', `${d.channel_direct ?? 0}%`)}
+      ${row('Organic Search', `${d.channel_organic ?? 0}%`)}
+      ${row('RSS', `${d.channel_rss ?? 0}%`)}
+      ${row('Referrals', `${d.channel_referrals ?? 0}%`)}
+      ${row('Other', `${d.channel_other ?? 0}%`)}
+      ${row('Rendimiento Móvil', `${d.score_mobile ?? 0}/100 (${d.rating_mobile || '—'})`)}
+      ${row('Rendimiento Desktop', `${d.score_desktop ?? 0}/100 (${d.rating_desktop || '—'})`)}
+    </table>`;
+
+  const section = (title, body) => `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+      <tr><td style="background:#1A000F; color:#C8A8BF; font-family:Arial,sans-serif; font-size:11px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; padding:10px 16px; border-radius:8px 8px 0 0;">${title}</td></tr>
+      <tr><td style="background:#240018; color:#FFFFFF; font-family:Arial,sans-serif; font-size:14px; padding:16px; border-radius:0 0 8px 8px;">${body}</td></tr>
+    </table>`;
+
+  const opportunities = [d.opportunity_1, d.opportunity_2, d.opportunity_3].filter(Boolean);
+  const recommendations = [d.recommendation_1, d.recommendation_2, d.recommendation_3].filter(Boolean);
+
+  const ranking = section('Ranking', `
+    Situación actual: ${d.ranking_current || '—'}<br>
+    Evolución vs. mes anterior: ${d.ranking_evolution || '—'}
+  `);
+
+  const opportunitiesSection = opportunities.length
+    ? section('Oportunidades identificadas', opportunities.join('<br>'))
+    : '';
+
+  const incidentsSection = d.incidents_resolved
+    ? section('Incidencias resueltas', d.incidents_resolved)
+    : '';
+
+  const nextStepsSection = (d.next_steps || recommendations.length)
+    ? section('Próximos pasos y recomendaciones', `
+        ${d.next_steps ? `${d.next_steps}<br><br>` : ''}
+        ${recommendations.length ? recommendations.join('<br>') : ''}
+      `)
+    : '';
+
+  const additionalSection = d.additional_message
+    ? section('Mensaje adicional', d.additional_message)
+    : '';
+
+  return `
+    <div style="background:#0F000A; padding:24px; font-family:Arial,sans-serif;">
+      <h1 style="color:#E91E8C; font-size:22px; margin:0 0 16px;">Informe mensual — ${d.site_name}</h1>
+      ${metricsTable}
+      ${ranking}
+      ${opportunitiesSection}
+      ${incidentsSection}
+      ${nextStepsSection}
+      ${additionalSection}
+    </div>`;
+}
+
+async function sendComposedReport(clientEmail, data) {
+  const html = renderComposedReportHtml(data);
+  const transport = getTransport();
+  await transport.sendMail({
+    from: SMTP_USER,
+    to: clientEmail,
+    subject: `Informe mensual — ${data.site_name}`,
+    html,
+  });
+}
+
 async function sendAlert(subject, html) {
   if (!ALERT_EMAIL) {
     throw new Error('Falta ALERT_EMAIL en la configuración.');
@@ -124,4 +203,4 @@ async function sendMetricZeroAlert(site, metric, previousValue) {
   );
 }
 
-module.exports = { sendReport, sendSourceFailureAlert, sendMetricZeroAlert };
+module.exports = { sendReport, sendComposedReport, sendSourceFailureAlert, sendMetricZeroAlert };

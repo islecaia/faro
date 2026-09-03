@@ -144,6 +144,57 @@ router.post('/generate-all', async (req, res, next) => {
   }
 });
 
+function pctChange(actual, anterior) {
+  if (!anterior) return '';
+  const value = Math.round(((actual - anterior) / anterior) * 10000) / 100;
+  return value >= 0 ? `+${value}` : `${value}`;
+}
+
+router.get('/:record_id/compose', async (req, res, next) => {
+  try {
+    const record = await recordsQueries.getRecordById(req.params.record_id);
+    if (!record) return res.status(404).send('Registro no encontrado');
+    const site = await sitesQueries.getSiteById(record.site_id);
+    const prev = await recordsQueries.getPreviousRecord(record.site_id, record.period);
+
+    await res.renderPage('reports/compose', {
+      screenHeading: 'Componer informe',
+      record,
+      site,
+      prev,
+      impressionsVariation: prev ? pctChange(record.impressions, prev.impressions) : '',
+      clicksVariation: prev ? pctChange(record.clicks, prev.clicks) : '',
+      justSent: req.query.sent === '1',
+      justError: req.query.error === '1',
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/:record_id/send', async (req, res, next) => {
+  try {
+    const record = await recordsQueries.getRecordById(req.params.record_id);
+    if (!record) return res.status(404).send('Registro no encontrado');
+    const site = await sitesQueries.getSiteById(record.site_id);
+
+    try {
+      await emailService.sendComposedReport(req.body.recipient_email || site.client_email, {
+        ...req.body,
+        site_name: site.name,
+      });
+    } catch (err) {
+      console.error(`[compose] no se pudo enviar el informe del registro ${record.id}: ${err.message}`);
+      return res.redirect(`/reports/${record.id}/compose?error=1`);
+    }
+
+    await recordsQueries.setEmailSentAt(record.id);
+    res.redirect(`/reports/${record.id}/compose?sent=1`);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/:record_id', async (req, res, next) => {
   try {
     const record = await recordsQueries.getRecordById(req.params.record_id);
