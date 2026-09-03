@@ -265,6 +265,7 @@ router.post('/:record_id/preview', async (req, res, next) => {
 });
 
 router.post('/:record_id/send', async (req, res, next) => {
+  console.log('[send] req.body.to:', req.body.to);
   try {
     const record = await recordsQueries.getRecordById(req.params.record_id);
     if (!record) return res.status(404).send('Registro no encontrado');

@@ -13,7 +13,8 @@
     <i class="ph ph-arrow-left"></i> Volver al formulario
   </a>
   <form id="confirm-send-form" action="/reports/<%= record.id %>/send" method="post" style="display:inline;">
-    <% Object.entries(formData).forEach(([key, value]) => { %>
+    <input type="hidden" name="to" value="<%= formData.to %>">
+    <% Object.entries(formData).filter(([key]) => key !== 'to').forEach(([key, value]) => { %>
       <input type="hidden" name="<%= key %>" value="<%= value %>">
     <% }) %>
     <button type="submit" id="confirm-send-btn" class="btn btn-primary">
