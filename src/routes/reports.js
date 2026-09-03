@@ -193,12 +193,29 @@ function renderTemplate(templateBody, variables) {
   ));
 }
 
+// El body de la plantilla personalizada es texto plano (\n como salto de línea, --- como
+// separador). Tras sustituir las variables, se convierte a HTML para que el email tenga
+// párrafos y saltos de línea reales en vez de \n literales.
+function plainTextToHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .split(/\n{2,}/)
+    .map((paragraph) => {
+      const trimmed = paragraph.trim();
+      if (/^-{3,}$/.test(trimmed)) return '<hr style="border:none; border-top:1px solid #ddd; margin:24px 0;">';
+      return `<p style="margin:0 0 16px;">${paragraph.replace(/\n/g, '<br>')}</p>`;
+    })
+    .join('');
+}
+
 // Construye el HTML final del informe compuesto: si hay una plantilla personalizada guardada
-// en /template, sustituye sus variables; si no, usa la plantilla fija de siempre como fallback.
+// en /template, sustituye sus variables y convierte el texto plano a HTML; si no, usa la
+// plantilla fija de siempre como fallback (ya es HTML con su propio estilo).
 async function buildComposedEmailHtml(record, site, body) {
   const template = await templateQueries.getTemplate();
   if (template && template.body) {
-    return renderTemplate(template.body, buildTemplateVariables(record, site, body));
+    const rendered = renderTemplate(template.body, buildTemplateVariables(record, site, body));
+    return `<div style="background:#ffffff; color:#222222; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.6;">${plainTextToHtml(rendered)}</div>`;
   }
   return emailService.renderComposedReportHtml({ ...body, site_name: site.name });
 }
