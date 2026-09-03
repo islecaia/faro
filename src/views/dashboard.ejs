@@ -40,25 +40,37 @@ function rowBorderColor(row) {
   <!-- Estas tarjetas reflejan la fila seleccionada en la tabla de histórico (ver selectRow,
        al final del archivo), no un valor fijo calculado en el servidor. -->
   <div class="kpi-grid">
-    <div class="kpi-card" data-metric="impressions">
+    <div class="kpi-card" data-metric="impressions" style="border-left: 4px solid #4361ee;">
       <div class="kpi-card-label section-label"><i class="ph ph-eye"></i> IMPRESIONES</div>
       <div class="kpi-card-value" id="kpi-value-impressions">—</div>
     </div>
-    <div class="kpi-card" data-metric="clicks">
+    <div class="kpi-card" data-metric="clicks" style="border-left: 4px solid #7209b7;">
       <div class="kpi-card-label section-label"><i class="ph ph-cursor-click"></i> CLICS</div>
       <div class="kpi-card-value" id="kpi-value-clicks">—</div>
     </div>
-    <div class="kpi-card" data-metric="visits">
+    <div class="kpi-card" data-metric="visits" style="border-left: 4px solid #2a9d8f;">
       <div class="kpi-card-label section-label"><i class="ph ph-users"></i> VISITAS</div>
       <div class="kpi-card-value" id="kpi-value-visits">—</div>
     </div>
-    <div class="kpi-card" data-metric="score_mobile">
+    <div class="kpi-card" data-metric="score_mobile" style="border-left: 4px solid #e9c46a;">
       <div class="kpi-card-label section-label"><i class="ph ph-gauge"></i> RENDIMIENTO MOBILE</div>
       <div class="kpi-card-value" id="kpi-value-score_mobile">—</div>
     </div>
-    <div class="kpi-card" data-metric="score_desktop">
+    <div class="kpi-card" data-metric="score_desktop" style="border-left: 4px solid #f4a261;">
       <div class="kpi-card-label section-label"><i class="ph ph-gauge"></i> RENDIMIENTO DESKTOP</div>
       <div class="kpi-card-value" id="kpi-value-score_desktop">—</div>
+    </div>
+    <div class="kpi-card" data-metric="ps_mobile" style="border-left: 4px solid #06d6a0;">
+      <div class="kpi-card-label section-label"><i class="ph ph-gauge"></i> PS MOBILE</div>
+      <div class="kpi-card-value" id="kpi-value-ps_mobile">—</div>
+    </div>
+    <div class="kpi-card" data-metric="ps_desktop" style="border-left: 4px solid #118ab2;">
+      <div class="kpi-card-label section-label"><i class="ph ph-gauge"></i> PS DESKTOP</div>
+      <div class="kpi-card-value" id="kpi-value-ps_desktop">—</div>
+    </div>
+    <div class="kpi-card" data-metric="threats_count" style="border-left: 4px solid #e63946;">
+      <div class="kpi-card-label section-label"><i class="ph ph-shield-warning"></i> AMENAZAS</div>
+      <div class="kpi-card-value" id="kpi-value-threats_count">—</div>
     </div>
   </div>
 <% } %>
@@ -91,10 +103,10 @@ function rowBorderColor(row) {
               <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_social %>"><%= row.pct_social %></td>
               <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_referral %>"><%= row.pct_referral %></td>
               <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_other %>"><%= row.pct_other %></td>
-              <td<%- sourceTooltip(row.sources_used, 'pagespeed') %> data-col="score_mobile" data-value="<%= row.score_mobile %>"><%= row.score_mobile %></td>
-              <td<%- sourceTooltip(row.sources_used, 'pagespeed') %> data-col="score_desktop" data-value="<%= row.score_desktop %>"><%= row.score_desktop %></td>
+              <td<%- sourceTooltip(row.sources_used, 'pagespeed') %> data-col="score_mobile ps_mobile" data-value="<%= row.score_mobile %>"><%= row.score_mobile %></td>
+              <td<%- sourceTooltip(row.sources_used, 'pagespeed') %> data-col="score_desktop ps_desktop" data-value="<%= row.score_desktop %>"><%= row.score_desktop %></td>
               <td<%- sourceTooltip(row.sources_used, 'security') %> data-value="<%= row.attacks_blocked %>"><%= row.attacks_blocked %></td>
-              <td<%- sourceTooltip(row.sources_used, 'security') %> data-value="<%= row.threats_count %>"><%= row.threats_count %></td>
+              <td<%- sourceTooltip(row.sources_used, 'security') %> data-col="threats_count" data-value="<%= row.threats_count %>"><%= row.threats_count %></td>
             </tr>
           <% }) %>
         </tbody>
@@ -186,11 +198,14 @@ function rowBorderColor(row) {
     tr.classList.add('row-selected');
 
     tr.querySelectorAll('td[data-col]').forEach(function (td) {
-      var metric = td.getAttribute('data-col');
-      var target = document.getElementById('kpi-value-' + metric);
-      if (target) {
-        target.textContent = td.getAttribute('data-value');
-      }
+      // data-col puede llevar varios nombres separados por espacio cuando una misma celda
+      // alimenta más de una tarjeta (p. ej. "score_mobile ps_mobile").
+      td.getAttribute('data-col').split(/\s+/).forEach(function (metric) {
+        var target = document.getElementById('kpi-value-' + metric);
+        if (target) {
+          target.textContent = td.getAttribute('data-value');
+        }
+      });
     });
 
     var composeBtn = document.getElementById('btn-compose');
