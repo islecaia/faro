@@ -9,8 +9,15 @@ function fmtDateTime(date) {
 
 <div style="display:flex; align-items:center; justify-content:space-between;">
   <h1 class="screen-heading">Sitios</h1>
-  <a href="/sites/new" class="btn btn-primary"><i class="ph ph-plus"></i> Añadir sitio</a>
+  <div>
+    <button type="button" id="generate-all-btn" class="btn btn-secondary">
+      <i class="ph ph-play"></i> <span id="generate-all-btn-label">Generar informe de todos los sitios</span>
+    </button>
+    <a href="/sites/new" class="btn btn-primary"><i class="ph ph-plus"></i> Añadir sitio</a>
+  </div>
 </div>
+
+<div id="generate-all-feedback" style="margin-bottom: var(--space-4);"></div>
 
 <% if (!sites.length) { %>
   <div class="card empty-state">
@@ -50,3 +57,86 @@ function fmtDateTime(date) {
     </table>
   </div>
 <% } %>
+
+<style>
+  .btn-spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    vertical-align: -2px;
+    animation: generate-all-btn-spin 700ms linear infinite;
+  }
+  @keyframes generate-all-btn-spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<script>
+  (function () {
+    var btn = document.getElementById('generate-all-btn');
+    var feedback = document.getElementById('generate-all-feedback');
+    if (!btn) return;
+
+    var originalHtml = btn.innerHTML;
+
+    function showBanner(kind, message) {
+      feedback.innerHTML = '';
+      var alert = document.createElement('div');
+      alert.className = 'alert alert-' + kind;
+      var icon = document.createElement('i');
+      icon.className = kind === 'success' ? 'ph ph-check-circle' : 'ph ph-warning-circle';
+      var text = document.createElement('div');
+      text.textContent = message;
+      alert.appendChild(icon);
+      alert.appendChild(text);
+      feedback.appendChild(alert);
+    }
+
+    btn.addEventListener('click', function () {
+      feedback.innerHTML = '';
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner"></span> Generando…';
+
+      var controller = new AbortController();
+      var timeoutId = setTimeout(function () { controller.abort(); }, 30000);
+
+      fetch('/reports/generate-all', { method: 'POST', signal: controller.signal })
+        .then(function (response) {
+          clearTimeout(timeoutId);
+          if (!response.ok) {
+            throw new Error('No se pudieron generar los informes. Inténtalo de nuevo.');
+          }
+          return response.json();
+        })
+        .then(function (result) {
+          if (result.errors && result.errors.length) {
+            showBanner(
+              'warning',
+              result.errors.length + ' de ' + result.total + ' sitios fallaron al generar su informe. El resto se generó correctamente. Yendo al dashboard…'
+            );
+          } else {
+            showBanner('success', result.total + ' informes generados correctamente. Yendo al dashboard…');
+          }
+          setTimeout(function () {
+            window.location.href = '/';
+          }, 1500);
+        })
+        .catch(function (err) {
+          clearTimeout(timeoutId);
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+          showBanner(
+            'error',
+            err.name === 'AbortError'
+              ? 'El servidor tardó demasiado. Algunos informes pueden haberse generado igualmente — comprueba el histórico.'
+              : err instanceof TypeError
+                ? 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.'
+                : err.message
+          );
+        });
+    });
+  })();
+</script>
