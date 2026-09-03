@@ -179,7 +179,7 @@ router.post('/:record_id/send', async (req, res, next) => {
     const site = await sitesQueries.getSiteById(record.site_id);
 
     try {
-      await emailService.sendComposedReport(req.body.recipient_email || site.client_email, {
+      await emailService.sendComposedReport(req.body.to, {
         ...req.body,
         site_name: site.name,
       });

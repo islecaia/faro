@@ -17,8 +17,8 @@
 <form id="compose-form" action="/reports/<%= record.id %>/send" method="post" class="form-grid">
   <p class="section-label">Cabecera</p>
   <div class="field">
-    <label for="recipient_email">Email destinatario</label>
-    <input type="email" id="recipient_email" name="recipient_email" value="<%= site.client_email %>" required>
+    <label for="to">Email destinatario</label>
+    <input type="email" id="to" name="to" value="<%= site.client_email %>" required>
   </div>
 
   <p class="section-label">Tráfico — Impresiones</p>
