@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS sites (
 --   "pagespeed": "PageSpeed Insights", "security": "Security Ninja" }
 ALTER TABLE sites ADD COLUMN IF NOT EXISTS sources_config JSONB DEFAULT '{}';
 
+ALTER TABLE sites ADD COLUMN IF NOT EXISTS contact_name TEXT;
+
 CREATE TABLE IF NOT EXISTS monthly_records (
   id              SERIAL PRIMARY KEY,
   site_id         INTEGER REFERENCES sites(id),

@@ -26,13 +26,14 @@ async function createSite(data) {
   if (data.source_security) sourcesConfig.security = data.source_security;
 
   const { rows } = await pool.query(
-    `INSERT INTO sites (name, url, client_email, sc_property_id, ga_property_id, keywords_site_id, security_site_id, sources_config)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `INSERT INTO sites (name, url, client_email, contact_name, sc_property_id, ga_property_id, keywords_site_id, security_site_id, sources_config)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      RETURNING *`,
     [
       data.name,
       data.url,
       data.client_email,
+      data.contact_name || null,
       data.sc_property_id || null,
       data.ga_property_id || null,
       data.keywords_site_id || null,
@@ -43,10 +44,10 @@ async function createSite(data) {
   return rows[0];
 }
 
-async function updateSite(id, { name, url, clientEmail, sourcesConfig }) {
+async function updateSite(id, { name, url, clientEmail, contactName, sourcesConfig }) {
   const { rows } = await pool.query(
-    `UPDATE sites SET name = $1, url = $2, client_email = $3, sources_config = $4 WHERE id = $5 RETURNING *`,
-    [name, url, clientEmail, JSON.stringify(sourcesConfig || {}), id]
+    `UPDATE sites SET name = $1, url = $2, client_email = $3, contact_name = $4, sources_config = $5 WHERE id = $6 RETURNING *`,
+    [name, url, clientEmail, contactName || null, JSON.stringify(sourcesConfig || {}), id]
   );
   return rows[0];
 }

@@ -63,6 +63,7 @@ router.post('/:id/edit', async (req, res, next) => {
       name: req.body.name,
       url: req.body.url,
       clientEmail: req.body.client_email,
+      contactName: req.body.contact_name,
       sourcesConfig,
     });
     res.redirect(`/sites/${req.params.id}`);

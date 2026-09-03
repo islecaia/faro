@@ -36,6 +36,11 @@ const sourcesConfig = site.sources_config || {};
     <input type="email" id="client_email" name="client_email" value="<%= site.client_email %>" required>
   </div>
 
+  <div class="field">
+    <label for="contact_name">Nombre del contacto</label>
+    <input type="text" id="contact_name" name="contact_name" value="<%= site.contact_name || '' %>">
+  </div>
+
   <p class="section-label">Fuentes de datos</p>
 
   <%- renderSourceSelect('source_clicks', 'Fuente de impresiones/clics', sourcesConfig.clicks) %>
