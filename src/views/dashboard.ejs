@@ -79,7 +79,7 @@ function rowBorderColor(row) {
             <tr class="<%= Object.values(row.sources_status || {}).includes('failed') ? 'row-error' : '' %>">
               <% const borderColor = rowBorderColor(row); %>
               <td style="font-family: var(--font-ui);<%= borderColor ? ` border-left: 3px solid ${borderColor};` : '' %>"><%= row.site_name %></td>
-              <td><%= new Date(row.period).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) %></td>
+              <td><%= new Date(row.period).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
               <td<%- sourceTooltip(row.sources_used, 'clicks') %> data-col="impressions" data-value="<%= row.impressions %>"><%= row.impressions %></td>
               <td<%- sourceTooltip(row.sources_used, 'clicks') %> data-col="clicks" data-value="<%= row.clicks %>"><%= row.clicks %></td>
               <td<%- sourceTooltip(row.sources_used, 'visits') %> data-col="visits" data-value="<%= row.visits %>"><%= row.visits %></td>
