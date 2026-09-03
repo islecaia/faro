@@ -1,10 +1,4 @@
 <%
-function fmtDelta(value) {
-  if (value === null || value === undefined) return '';
-  const arrow = value >= 0 ? '▲' : '▼';
-  const cls = value >= 0 ? 'positive' : 'negative';
-  return `<div class="kpi-card-delta ${cls}">${arrow} ${Math.abs(value)}% vs mes anterior</div>`;
-}
 function sourceTooltip(sourcesUsed, category) {
   const entry = sourcesUsed && sourcesUsed[category];
   if (!entry || !entry.tool) return '';
@@ -34,35 +28,35 @@ function rowBorderColor(row) {
   </form>
 </div>
 
-<% if (!kpis.length) { %>
+<% if (!historical.length) { %>
   <div class="card empty-state">
     Aún no hay registros para este sitio.<br>
     Genera el primer informe mensual para empezar el histórico.
   </div>
 <% } else { %>
+  <!-- Estas tarjetas reflejan la fila seleccionada en la tabla de histórico (ver selectRow,
+       al final del archivo), no un valor fijo calculado en el servidor. -->
   <div class="kpi-grid">
-    <% kpis.forEach(kpi => { %>
-      <div class="kpi-card">
-        <div class="kpi-card-label section-label"><i class="ph ph-eye"></i> <%= kpi.site_name %> — IMPRESIONES</div>
-        <div class="kpi-card-value" data-value="<%= kpi.impressions %>"><%= kpi.impressions %></div>
-        <%- fmtDelta(kpi.delta_impressions) %>
-        <div class="caption"><%= new Date(kpi.period).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) %></div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-card-label section-label"><i class="ph ph-cursor-click"></i> <%= kpi.site_name %> — CLICS</div>
-        <div class="kpi-card-value" data-value="<%= kpi.clicks %>"><%= kpi.clicks %></div>
-        <%- fmtDelta(kpi.delta_clicks) %>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-card-label section-label"><i class="ph ph-users"></i> <%= kpi.site_name %> — VISITAS</div>
-        <div class="kpi-card-value" data-value="<%= kpi.visits %>"><%= kpi.visits %></div>
-        <%- fmtDelta(kpi.delta_visits) %>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-card-label section-label"><i class="ph ph-gauge"></i> <%= kpi.site_name %> — PAGESPEED</div>
-        <div class="kpi-card-value">M <%= kpi.score_mobile %> / D <%= kpi.score_desktop %></div>
-      </div>
-    <% }) %>
+    <div class="kpi-card" data-metric="impressions">
+      <div class="kpi-card-label section-label"><i class="ph ph-eye"></i> IMPRESIONES</div>
+      <div class="kpi-card-value" id="kpi-value-impressions">—</div>
+    </div>
+    <div class="kpi-card" data-metric="clicks">
+      <div class="kpi-card-label section-label"><i class="ph ph-cursor-click"></i> CLICS</div>
+      <div class="kpi-card-value" id="kpi-value-clicks">—</div>
+    </div>
+    <div class="kpi-card" data-metric="visits">
+      <div class="kpi-card-label section-label"><i class="ph ph-users"></i> VISITAS</div>
+      <div class="kpi-card-value" id="kpi-value-visits">—</div>
+    </div>
+    <div class="kpi-card" data-metric="score_mobile">
+      <div class="kpi-card-label section-label"><i class="ph ph-gauge"></i> RENDIMIENTO MOBILE</div>
+      <div class="kpi-card-value" id="kpi-value-score_mobile">—</div>
+    </div>
+    <div class="kpi-card" data-metric="score_desktop">
+      <div class="kpi-card-label section-label"><i class="ph ph-gauge"></i> RENDIMIENTO DESKTOP</div>
+      <div class="kpi-card-value" id="kpi-value-score_desktop">—</div>
+    </div>
   </div>
 <% } %>
 
@@ -86,16 +80,16 @@ function rowBorderColor(row) {
               <% const borderColor = rowBorderColor(row); %>
               <td style="font-family: var(--font-ui);<%= borderColor ? ` border-left: 3px solid ${borderColor};` : '' %>"><%= row.site_name %></td>
               <td><%= new Date(row.period).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) %></td>
-              <td<%- sourceTooltip(row.sources_used, 'clicks') %> data-value="<%= row.impressions %>"><%= row.impressions %></td>
-              <td<%- sourceTooltip(row.sources_used, 'clicks') %> data-value="<%= row.clicks %>"><%= row.clicks %></td>
-              <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.visits %>"><%= row.visits %></td>
+              <td<%- sourceTooltip(row.sources_used, 'clicks') %> data-col="impressions" data-value="<%= row.impressions %>"><%= row.impressions %></td>
+              <td<%- sourceTooltip(row.sources_used, 'clicks') %> data-col="clicks" data-value="<%= row.clicks %>"><%= row.clicks %></td>
+              <td<%- sourceTooltip(row.sources_used, 'visits') %> data-col="visits" data-value="<%= row.visits %>"><%= row.visits %></td>
               <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_direct %>"><%= row.pct_direct %></td>
               <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_organic %>"><%= row.pct_organic %></td>
               <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_social %>"><%= row.pct_social %></td>
               <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_referral %>"><%= row.pct_referral %></td>
               <td<%- sourceTooltip(row.sources_used, 'visits') %> data-value="<%= row.pct_other %>"><%= row.pct_other %></td>
-              <td<%- sourceTooltip(row.sources_used, 'pagespeed') %> data-value="<%= row.score_mobile %>"><%= row.score_mobile %></td>
-              <td<%- sourceTooltip(row.sources_used, 'pagespeed') %> data-value="<%= row.score_desktop %>"><%= row.score_desktop %></td>
+              <td<%- sourceTooltip(row.sources_used, 'pagespeed') %> data-col="score_mobile" data-value="<%= row.score_mobile %>"><%= row.score_mobile %></td>
+              <td<%- sourceTooltip(row.sources_used, 'pagespeed') %> data-col="score_desktop" data-value="<%= row.score_desktop %>"><%= row.score_desktop %></td>
               <td<%- sourceTooltip(row.sources_used, 'security') %> data-value="<%= row.attacks_blocked %>"><%= row.attacks_blocked %></td>
               <td<%- sourceTooltip(row.sources_used, 'security') %> data-value="<%= row.threats_count %>"><%= row.threats_count %></td>
             </tr>
@@ -178,16 +172,34 @@ function rowBorderColor(row) {
 </div>
 
 <script>
-  (function () {
+  // Marca tr como la fila seleccionada y vuelca sus data-value en las tarjetas de resumen
+  // que compartan el mismo nombre de métrica (data-col en el <td> <-> data-metric/id en la tarjeta).
+  function selectRow(tr) {
+    if (!tr) return;
+
+    document.querySelectorAll('#historical-table tbody tr').forEach(function (r) {
+      r.classList.remove('row-selected');
+    });
+    tr.classList.add('row-selected');
+
+    tr.querySelectorAll('td[data-col]').forEach(function (td) {
+      var metric = td.getAttribute('data-col');
+      var target = document.getElementById('kpi-value-' + metric);
+      if (target) {
+        target.textContent = td.getAttribute('data-value');
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
     var rows = document.querySelectorAll('#historical-table tbody tr');
     rows.forEach(function (row) {
       row.addEventListener('click', function () {
-        var wasSelected = row.classList.contains('row-selected');
-        rows.forEach(function (r) { r.classList.remove('row-selected'); });
-        if (!wasSelected) {
-          row.classList.add('row-selected');
-        }
+        selectRow(this);
       });
     });
-  })();
+    if (rows.length) {
+      selectRow(rows[0]);
+    }
+  });
 </script>
