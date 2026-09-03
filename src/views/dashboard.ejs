@@ -27,6 +27,7 @@ function rowBorderColor(row) {
         <% }) %>
       </select>
     </form>
+    <button type="button" id="btn-export-csv" class="btn btn-secondary">Exportar CSV</button>
     <a id="btn-compose" href="#" class="btn btn-primary" hidden>Componer informe</a>
   </div>
 </div>
@@ -215,6 +216,54 @@ function rowBorderColor(row) {
     }
   }
 
+  // Construye el CSV a partir del DOM de la tabla de histórico (mismos data-* que usan las
+  // tarjetas KPI vía selectRow), sin volver a pedir nada al servidor.
+  function exportCSV() {
+    var headers = ['Sitio', 'Periodo', 'Impresiones', 'Clics', 'Visitas', 'Score Mobile', 'Score Desktop', 'Amenazas', 'Estado', 'Fecha'];
+    var rows = [headers];
+
+    document.querySelectorAll('#historical-table tbody tr').forEach(function (tr) {
+      var siteName = tr.children[0] ? tr.children[0].textContent.trim() : '';
+      var fecha = tr.children[1] ? tr.children[1].textContent.trim() : '';
+      var estado = tr.classList.contains('row-error') ? 'Error' : 'OK';
+
+      function valueOf(metric) {
+        var td = tr.querySelector('td[data-col~="' + metric + '"]');
+        return td ? td.getAttribute('data-value') : '';
+      }
+
+      rows.push([
+        siteName,
+        fecha,
+        valueOf('impressions'),
+        valueOf('clicks'),
+        valueOf('visits'),
+        valueOf('score_mobile'),
+        valueOf('score_desktop'),
+        valueOf('threats_count'),
+        estado,
+        fecha,
+      ]);
+    });
+
+    var csv = rows.map(function (row) {
+      return row.map(function (value) {
+        var str = value === null || value === undefined ? '' : String(value);
+        return /[",\n]/.test(str) ? '"' + str.replace(/"/g, '""') + '"' : str;
+      }).join(',');
+    }).join('\r\n');
+
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'historico_faro.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     var rows = document.querySelectorAll('#historical-table tbody tr');
     rows.forEach(function (row) {
@@ -224,6 +273,11 @@ function rowBorderColor(row) {
     });
     if (rows.length) {
       selectRow(rows[0]);
+    }
+
+    var exportBtn = document.getElementById('btn-export-csv');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', exportCSV);
     }
   });
 </script>
