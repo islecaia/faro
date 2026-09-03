@@ -27,6 +27,7 @@ const SOURCE_CATEGORIES = [
   <p class="section-label">Datos del sitio</p>
   <p><strong>URL:</strong> <a href="<%= site.url %>" target="_blank" rel="noopener"><%= site.url %></a></p>
   <p><strong>Email del cliente:</strong> <%= site.client_email %></p>
+  <p><strong>Nombre del contacto:</strong> <%= site.contact_name || '—' %></p>
   <p class="caption">Último informe: <%= fmtDateTime(site.last_report_date) %></p>
 </div>
 
