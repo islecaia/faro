@@ -50,7 +50,7 @@ async function getTransport() {
   return nodemailer.createTransport({
     host: config.host,
     port: Number(config.port) || 587,
-    secure: Number(config.port) === 465,
+    secure: parseInt(config.port) === 465,
     auth: { user: config.user, pass: config.pass },
   });
 }
