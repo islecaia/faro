@@ -25,6 +25,8 @@ const variables = [
 ];
 %>
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet">
+
 <h1 class="screen-heading">Plantilla de email</h1>
 
 <% if (justSaved) { %>
@@ -35,10 +37,11 @@ const variables = [
 <% } %>
 
 <div style="display:flex; gap: var(--space-4); align-items:flex-start;">
-  <form action="/template" method="post" style="flex: 1;">
+  <form id="template-form" action="/template" method="post" style="flex: 1;">
     <div class="field">
-      <label for="template-body">Contenido de la plantilla (HTML)</label>
-      <textarea id="template-body" name="body" rows="20" style="font-family: var(--font-mono); font-size: 13px;"><%= body %></textarea>
+      <label>Contenido de la plantilla</label>
+      <div id="editor" style="background:#ffffff; color:#222222;"></div>
+      <input type="hidden" id="body-input" name="body">
     </div>
     <div>
       <button type="submit" class="btn btn-primary"><i class="ph ph-check"></i> Guardar plantilla</button>
@@ -58,20 +61,41 @@ const variables = [
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
 <script>
   (function () {
-    var textarea = document.getElementById('template-body');
+    var quill = new Quill('#editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline'],
+          [{ color: [] }, { background: [] }],
+          [{ font: [] }],
+          [{ size: ['small', false, 'large', 'huge'] }],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          [{ align: [] }],
+          ['link'],
+        ],
+      },
+    });
+
+    var initialBody = '<%= body %>';
+    if (initialBody) {
+      quill.root.innerHTML = initialBody;
+    }
+
     document.querySelectorAll('.template-var-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var placeholder = '{{' + btn.getAttribute('data-var') + '}}';
-        var start = textarea.selectionStart;
-        var end = textarea.selectionEnd;
-        var value = textarea.value;
-        textarea.value = value.slice(0, start) + placeholder + value.slice(end);
-        var cursor = start + placeholder.length;
-        textarea.focus();
-        textarea.setSelectionRange(cursor, cursor);
+        var range = quill.getSelection(true);
+        var index = range ? range.index : quill.getLength();
+        quill.insertText(index, placeholder);
+        quill.setSelection(index + placeholder.length);
       });
+    });
+
+    document.getElementById('template-form').addEventListener('submit', function () {
+      document.getElementById('body-input').value = quill.root.innerHTML;
     });
   })();
 </script>
