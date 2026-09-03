@@ -57,6 +57,17 @@ const SOURCE_FIELDS = [
       { name: 'api_key', label: 'API Key', type: 'password' },
     ],
   },
+  {
+    key: 'smtp',
+    label: 'Correo de envío',
+    fields: [
+      { name: 'host', label: 'Host SMTP', type: 'text', placeholder: 'ej. smtp.gmail.com' },
+      { name: 'port', label: 'Puerto', type: 'text', placeholder: '587' },
+      { name: 'user', label: 'Usuario', type: 'text', placeholder: 'tu-email@proveedor.com' },
+      { name: 'pass', label: 'Contraseña', type: 'password', placeholder: 'Contraseña o contraseña de aplicación' },
+      { name: 'from', label: 'Remitente', type: 'text', placeholder: 'Nombre o email que verá el destinatario' },
+    ],
+  },
 ];
 
 router.get('/', async (req, res, next) => {
