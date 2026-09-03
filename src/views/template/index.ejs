@@ -1,0 +1,77 @@
+<%
+const variables = [
+  { key: 'sitio', label: 'Nombre del sitio' },
+  { key: 'periodo', label: 'Periodo del informe' },
+  { key: 'impresiones', label: 'Impresiones' },
+  { key: 'clics', label: 'Clics' },
+  { key: 'visitas', label: 'Visitas' },
+  { key: 'direct', label: 'Tráfico directo (%)' },
+  { key: 'organico', label: 'Tráfico orgánico (%)' },
+  { key: 'rss', label: 'Tráfico RSS (%)' },
+  { key: 'referrals', label: 'Tráfico de referrals (%)' },
+  { key: 'other', label: 'Otro tráfico (%)' },
+  { key: 'rendimiento_movil', label: 'Rendimiento móvil' },
+  { key: 'rendimiento_desktop', label: 'Rendimiento desktop' },
+  { key: 'ranking', label: 'Ranking actual' },
+  { key: 'evolucion', label: 'Evolución del ranking' },
+  { key: 'oportunidad_1', label: 'Oportunidad 1' },
+  { key: 'oportunidad_2', label: 'Oportunidad 2' },
+  { key: 'oportunidad_3', label: 'Oportunidad 3' },
+  { key: 'incidencias', label: 'Incidencias resueltas' },
+  { key: 'paso_1', label: 'Paso / recomendación 1' },
+  { key: 'paso_2', label: 'Paso / recomendación 2' },
+  { key: 'paso_3', label: 'Paso / recomendación 3' },
+  { key: 'mensaje', label: 'Mensaje adicional' },
+];
+%>
+
+<h1 class="screen-heading">Plantilla de email</h1>
+
+<% if (justSaved) { %>
+  <div class="alert alert-success">
+    <i class="ph ph-check-circle"></i>
+    <div>Plantilla guardada correctamente.</div>
+  </div>
+<% } %>
+
+<div style="display:flex; gap: var(--space-4); align-items:flex-start;">
+  <form action="/template" method="post" style="flex: 1;">
+    <div class="field">
+      <label for="template-body">Contenido de la plantilla (HTML)</label>
+      <textarea id="template-body" name="body" rows="20" style="font-family: var(--font-mono); font-size: 13px;"><%= body %></textarea>
+    </div>
+    <div>
+      <button type="submit" class="btn btn-primary"><i class="ph ph-check"></i> Guardar plantilla</button>
+    </div>
+  </form>
+
+  <div class="card" style="width: 280px; flex-shrink: 0;">
+    <p class="section-label">Variables disponibles</p>
+    <p class="caption" style="margin-bottom: var(--space-3);">Haz clic en una variable para insertarla en el cursor.</p>
+    <div style="display:flex; flex-direction:column; gap: var(--space-2);">
+      <% variables.forEach(v => { %>
+        <button type="button" class="btn btn-ghost template-var-btn" data-var="<%= v.key %>" style="justify-content:flex-start; text-align:left;">
+          <code><%- '{{' + v.key + '}}' %></code> — <%= v.label %>
+        </button>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var textarea = document.getElementById('template-body');
+    document.querySelectorAll('.template-var-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var placeholder = '{{' + btn.getAttribute('data-var') + '}}';
+        var start = textarea.selectionStart;
+        var end = textarea.selectionEnd;
+        var value = textarea.value;
+        textarea.value = value.slice(0, start) + placeholder + value.slice(end);
+        var cursor = start + placeholder.length;
+        textarea.focus();
+        textarea.setSelectionRange(cursor, cursor);
+      });
+    });
+  })();
+</script>

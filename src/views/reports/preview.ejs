@@ -1,0 +1,50 @@
+<h1 class="screen-heading">Vista previa del informe</h1>
+
+<p class="caption" style="margin-bottom: var(--space-4);">Así se verá el email. Revisa el contenido antes de enviarlo.</p>
+
+<div class="card" style="padding:0; overflow:hidden; margin-bottom: var(--space-4);">
+  <iframe srcdoc="<%- emailHtml.replace(/"/g, '&quot;') %>" style="width:100%; height:70vh; border:none; display:block;"></iframe>
+</div>
+
+<div style="display:flex; gap: var(--space-3);">
+  <a href="/reports/<%= record.id %>/compose" class="btn btn-ghost">
+    <i class="ph ph-arrow-left"></i> Volver al formulario
+  </a>
+  <form id="confirm-send-form" action="/reports/<%= record.id %>/send" method="post" style="display:inline;">
+    <% Object.entries(formData).forEach(([key, value]) => { %>
+      <input type="hidden" name="<%= key %>" value="<%= value %>">
+    <% }) %>
+    <button type="submit" id="confirm-send-btn" class="btn btn-primary">
+      <i class="ph ph-paper-plane-tilt"></i> <span id="confirm-send-btn-label">Confirmar y enviar</span>
+    </button>
+  </form>
+</div>
+
+<style>
+  .btn-spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    vertical-align: -2px;
+    animation: preview-btn-spin 700ms linear infinite;
+  }
+  @keyframes preview-btn-spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<script>
+  (function () {
+    var form = document.getElementById('confirm-send-form');
+    var btn = document.getElementById('confirm-send-btn');
+    if (!form || !btn) return;
+
+    form.addEventListener('submit', function () {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner"></span> Enviando…';
+    });
+  })();
+</script>

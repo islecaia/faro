@@ -32,7 +32,7 @@ function ratingOptions(score) {
   </div>
 <% } %>
 
-<form id="compose-form" action="/reports/<%= record.id %>/send" method="post" class="form-grid">
+<form id="compose-form" action="/reports/<%= record.id %>/preview" method="post" class="form-grid">
   <p class="section-label">Cabecera</p>
   <div class="field">
     <label for="to">Email destinatario</label>
@@ -135,7 +135,7 @@ function ratingOptions(score) {
 
   <div>
     <button type="submit" id="compose-send-btn" class="btn btn-primary">
-      <i class="ph ph-envelope"></i> <span id="compose-send-btn-label">Enviar</span>
+      <i class="ph ph-eye"></i> <span id="compose-send-btn-label">Vista previa</span>
     </button>
     <a href="/reports/<%= record.id %>" class="btn btn-ghost">Cancelar</a>
   </div>
@@ -163,12 +163,11 @@ function ratingOptions(score) {
     var btn = document.getElementById('compose-send-btn');
     if (!form || !btn) return;
 
-    // Envío normal del formulario (sin fetch): la propia redirección del servidor a
-    // /compose?sent=1 o /compose?error=1 vuelve a renderizar esta página con el botón
-    // en su estado inicial, así que no hace falta restaurarlo aquí.
+    // Envío normal del formulario (sin fetch): el POST navega a /preview, que renderiza una
+    // página nueva, así que no hace falta restaurar el botón aquí.
     form.addEventListener('submit', function () {
       btn.disabled = true;
-      btn.innerHTML = '<span class="btn-spinner"></span> Enviando…';
+      btn.innerHTML = '<span class="btn-spinner"></span> Generando vista previa…';
     });
   })();
 </script>

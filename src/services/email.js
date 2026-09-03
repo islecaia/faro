@@ -174,11 +174,6 @@ function renderComposedReportHtml(d) {
     </div>`;
 }
 
-async function sendComposedReport(clientEmail, data) {
-  const html = renderComposedReportHtml(data);
-  await sendEmail({ to: clientEmail, subject: `Informe mensual — ${data.site_name}`, html });
-}
-
 async function sendAlert(subject, html) {
   if (!ALERT_EMAIL) {
     throw new Error('Falta ALERT_EMAIL en la configuración.');
@@ -206,4 +201,10 @@ async function sendMetricZeroAlert(site, metric, previousValue) {
   );
 }
 
-module.exports = { sendReport, sendComposedReport, sendSourceFailureAlert, sendMetricZeroAlert };
+module.exports = {
+  sendReport,
+  sendSourceFailureAlert,
+  sendMetricZeroAlert,
+  renderComposedReportHtml,
+  sendEmail,
+};

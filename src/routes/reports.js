@@ -2,6 +2,7 @@ const express = require('express');
 const sitesQueries = require('../db/queries/sites');
 const recordsQueries = require('../db/queries/records');
 const keywordsQueries = require('../db/queries/keywords');
+const templateQueries = require('../db/queries/template');
 const collector = require('../services/collector');
 const sheetsService = require('../services/sheets');
 const emailService = require('../services/email');
@@ -150,6 +151,58 @@ function pctChange(actual, anterior) {
   return value >= 0 ? `+${value}` : `${value}`;
 }
 
+function variationText(value, variation) {
+  if (variation === undefined || variation === null || variation === '') return `${value}`;
+  const sign = String(variation).trim().startsWith('-') ? '' : '+';
+  return `${value} (${sign}${variation}% vs mes anterior)`;
+}
+
+// Mapea las 22 variables {{...}} de la plantilla personalizada (/template) a los valores
+// reales del registro y del formulario de "Componer informe". paso_1/2/3 se corresponden con
+// recommendation_1/2/3 (next_steps es texto libre sin variable propia en la plantilla).
+function buildTemplateVariables(record, site, body) {
+  return {
+    sitio: site.name,
+    periodo: new Date(record.period).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
+    impresiones: variationText(body.impressions, body.impressions_variation),
+    clics: variationText(body.clicks, body.clicks_variation),
+    visitas: record.visits,
+    direct: body.channel_direct,
+    organico: body.channel_organic,
+    rss: body.channel_rss,
+    referrals: body.channel_referrals,
+    other: body.channel_other,
+    rendimiento_movil: `${body.score_mobile}/100 (${body.rating_mobile || ''})`,
+    rendimiento_desktop: `${body.score_desktop}/100 (${body.rating_desktop || ''})`,
+    ranking: body.ranking_current || '—',
+    evolucion: body.ranking_evolution || '—',
+    oportunidad_1: body.opportunity_1 || '',
+    oportunidad_2: body.opportunity_2 || '',
+    oportunidad_3: body.opportunity_3 || '',
+    incidencias: body.incidents_resolved || '',
+    paso_1: body.recommendation_1 || '',
+    paso_2: body.recommendation_2 || '',
+    paso_3: body.recommendation_3 || '',
+    mensaje: body.additional_message || '',
+  };
+}
+
+function renderTemplate(templateBody, variables) {
+  return templateBody.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (match, key) => (
+    Object.prototype.hasOwnProperty.call(variables, key) ? String(variables[key] ?? '') : match
+  ));
+}
+
+// Construye el HTML final del informe compuesto: si hay una plantilla personalizada guardada
+// en /template, sustituye sus variables; si no, usa la plantilla fija de siempre como fallback.
+async function buildComposedEmailHtml(record, site, body) {
+  const template = await templateQueries.getTemplate();
+  if (template && template.body) {
+    return renderTemplate(template.body, buildTemplateVariables(record, site, body));
+  }
+  return emailService.renderComposedReportHtml({ ...body, site_name: site.name });
+}
+
 router.get('/:record_id/compose', async (req, res, next) => {
   try {
     const record = await recordsQueries.getRecordById(req.params.record_id);
@@ -172,6 +225,28 @@ router.get('/:record_id/compose', async (req, res, next) => {
   }
 });
 
+// El botón "Vista previa" de compose.ejs llega aquí por POST (no GET: el formulario tiene
+// más de 20 campos, algunos de texto libre largo, inviables como query string). Reenvía todos
+// los campos originales en un formulario oculto para poder "Confirmar y enviar" a /send.
+router.post('/:record_id/preview', async (req, res, next) => {
+  try {
+    const record = await recordsQueries.getRecordById(req.params.record_id);
+    if (!record) return res.status(404).send('Registro no encontrado');
+    const site = await sitesQueries.getSiteById(record.site_id);
+
+    const emailHtml = await buildComposedEmailHtml(record, site, req.body);
+
+    await res.renderPage('reports/preview', {
+      screenHeading: 'Vista previa del informe',
+      record,
+      formData: req.body,
+      emailHtml,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/:record_id/send', async (req, res, next) => {
   try {
     const record = await recordsQueries.getRecordById(req.params.record_id);
@@ -179,9 +254,11 @@ router.post('/:record_id/send', async (req, res, next) => {
     const site = await sitesQueries.getSiteById(record.site_id);
 
     try {
-      await emailService.sendComposedReport(req.body.to, {
-        ...req.body,
-        site_name: site.name,
+      const html = await buildComposedEmailHtml(record, site, req.body);
+      await emailService.sendEmail({
+        to: req.body.to,
+        subject: `Informe mensual — ${site.name}`,
+        html,
       });
     } catch (err) {
       console.error(`[compose] no se pudo enviar el informe del registro ${record.id}: ${err.message}`);
