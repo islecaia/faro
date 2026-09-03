@@ -1,5 +1,5 @@
-const nodemailer = require('nodemailer');
-const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, ALERT_EMAIL } = require('../config/env');
+const { Resend } = require('resend');
+const { ALERT_EMAIL } = require('../config/env');
 const sourcesQueries = require('../db/queries/sources');
 
 const SOURCE_LABELS = {
@@ -17,47 +17,21 @@ const METRIC_LABELS = {
   attacks_blocked: 'Los ataques bloqueados',
 };
 
-// Resuelve la configuración SMTP a usar: primero busca credenciales guardadas en
-// source_credentials (source_key='smtp', configurables desde /sources); si no hay ninguna
-// guardada ahí, cae a las variables de entorno SMTP_* (comportamiento previo, para no romper
-// despliegues que aún no han rellenado esa pantalla).
-async function resolveSmtpConfig() {
-  try {
-    const rows = await sourcesQueries.getAllCredentials();
-    const row = rows.find((r) => r.source_key === 'smtp');
-    const config = row && row.config;
-    if (config && config.host && config.user && config.pass) {
-      return {
-        host: config.host,
-        port: config.port,
-        user: config.user,
-        pass: config.pass,
-        from: config.from || config.user,
-      };
-    }
-  } catch (err) {
-    console.error(`[email] no se pudo leer la configuración SMTP guardada, usando variables de entorno: ${err.message}`);
+// La API key de Resend y el remitente se configuran en /sources (source_key='smtp',
+// campos resend_api_key y from) — sin fallback a variables de entorno.
+async function resolveEmailConfig() {
+  const rows = await sourcesQueries.getAllCredentials();
+  const row = rows.find((r) => r.source_key === 'smtp');
+  const config = row && row.config;
+  if (!config || !config.resend_api_key) {
+    throw new Error('Falta resend_api_key en la configuración de Correo de envío (/sources).');
   }
-
-  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
-    throw new Error('Faltan SMTP_HOST/SMTP_USER/SMTP_PASS en la configuración.');
-  }
-  return { host: SMTP_HOST, port: SMTP_PORT, user: SMTP_USER, pass: SMTP_PASS, from: SMTP_USER };
+  return { apiKey: config.resend_api_key, from: config.from };
 }
 
-async function getTransport() {
-  const config = await resolveSmtpConfig();
-  return nodemailer.createTransport({
-    host: config.host,
-    port: Number(config.port) || 587,
-    secure: parseInt(config.port) === 465,
-    auth: { user: config.user, pass: config.pass },
-  });
-}
-
-async function getFromAddress() {
-  const config = await resolveSmtpConfig();
-  return config.from;
+async function sendEmail({ to, subject, html }) {
+  const { apiKey, from } = await resolveEmailConfig();
+  await new Resend(apiKey).emails.send({ from, to, subject, html });
 }
 
 function variationText(value, variation) {
@@ -119,13 +93,7 @@ function renderReportHtml(d) {
 
 async function sendReport(clientEmail, data) {
   const html = renderReportHtml(data);
-  const transport = await getTransport();
-  await transport.sendMail({
-    from: await getFromAddress(),
-    to: clientEmail,
-    subject: `Informe mensual — ${data.site_name}`,
-    html,
-  });
+  await sendEmail({ to: clientEmail, subject: `Informe mensual — ${data.site_name}`, html });
 }
 
 // Plantilla del informe "compuesto" (formulario libre de dashboard → /reports/:id/compose):
@@ -198,21 +166,14 @@ function renderComposedReportHtml(d) {
 
 async function sendComposedReport(clientEmail, data) {
   const html = renderComposedReportHtml(data);
-  const transport = await getTransport();
-  await transport.sendMail({
-    from: await getFromAddress(),
-    to: clientEmail,
-    subject: `Informe mensual — ${data.site_name}`,
-    html,
-  });
+  await sendEmail({ to: clientEmail, subject: `Informe mensual — ${data.site_name}`, html });
 }
 
 async function sendAlert(subject, html) {
   if (!ALERT_EMAIL) {
     throw new Error('Falta ALERT_EMAIL en la configuración.');
   }
-  const transport = await getTransport();
-  await transport.sendMail({ from: await getFromAddress(), to: ALERT_EMAIL, subject, html });
+  await sendEmail({ to: ALERT_EMAIL, subject, html });
 }
 
 // FR-020: aviso al Admin cuando una fuente falla tras sus 3 reintentos.

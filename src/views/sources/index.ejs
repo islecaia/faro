@@ -38,9 +38,6 @@ function attr(name, value) {
           <% } else { %>
             <input type="text" id="<%= inputId %>" name="<%= inputId %>" value="<%= value %>"<%- attr('placeholder', field.placeholder) %>>
           <% } %>
-          <% if (source.key === 'smtp' && field.name === 'pass') { %>
-            <p class="caption">Si usas Gmail, genera una contraseña de aplicación en: Google Account → Seguridad → Verificación en dos pasos → Contraseñas de aplicaciones.</p>
-          <% } %>
         </div>
       <% }) %>
     </div>

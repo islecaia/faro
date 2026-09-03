@@ -59,13 +59,10 @@ const SOURCE_FIELDS = [
   },
   {
     key: 'smtp',
-    label: 'Correo de envío',
+    label: 'Correo de envío (Resend)',
     fields: [
-      { name: 'host', label: 'Host SMTP', type: 'text', placeholder: 'ej. smtp.gmail.com' },
-      { name: 'port', label: 'Puerto', type: 'text', placeholder: '587' },
-      { name: 'user', label: 'Usuario', type: 'text', placeholder: 'tu-email@proveedor.com' },
-      { name: 'pass', label: 'Contraseña', type: 'password', placeholder: 'Contraseña o contraseña de aplicación' },
-      { name: 'from', label: 'Remitente', type: 'text', placeholder: 'Nombre o email que verá el destinatario' },
+      { name: 'resend_api_key', label: 'API Key de Resend', type: 'password' },
+      { name: 'from', label: 'Remitente', type: 'text', placeholder: 'Faro <hola@tudominio.com>' },
     ],
   },
 ];
