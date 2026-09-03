@@ -38,7 +38,6 @@ router.get('/', async (req, res, next) => {
       screenHeading: 'Plantilla',
       body,
       justSaved: req.query.saved === '1',
-      extraHead: '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css">',
     });
   } catch (err) {
     next(err);
