@@ -27,6 +27,7 @@ app.use('/sites', require('./routes/sites'));
 app.use('/reports', require('./routes/reports'));
 app.use('/sheets', require('./routes/sheets'));
 app.use('/email-form', require('./routes/email-form'));
+app.use('/sources', require('./routes/sources'));
 
 app.listen(PORT, () => {
   console.log(`Faro escuchando en http://localhost:${PORT}`);

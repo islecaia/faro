@@ -1,0 +1,62 @@
+<%
+function attr(name, value) {
+  return value ? ` ${name}="${value}"` : '';
+}
+%>
+
+<h1 class="screen-heading">Origen de datos</h1>
+
+<% if (justSaved) { %>
+  <div class="alert alert-success">
+    <i class="ph ph-check-circle"></i>
+    <div>Credenciales guardadas correctamente</div>
+  </div>
+<% } %>
+
+<form action="/sources" method="post" class="form-grid" style="max-width: 640px;">
+  <% sourceFields.forEach(source => { %>
+    <div class="card" style="margin-bottom: var(--space-4);">
+      <p class="section-label"><%= source.label %></p>
+      <% source.fields.forEach(field => {
+        const inputId = `${source.key}_${field.name}`;
+        const value = (credentials[source.key] && credentials[source.key][field.name]) || '';
+      %>
+        <div class="field">
+          <label for="<%= inputId %>"><%= field.label %></label>
+          <% if (field.type === 'textarea') { %>
+            <textarea id="<%= inputId %>" name="<%= inputId %>" rows="6"><%= value %></textarea>
+          <% } else if (field.type === 'password') { %>
+            <div style="position:relative;">
+              <input type="password" id="<%= inputId %>" name="<%= inputId %>" value="<%= value %>" style="padding-right: 40px; width: 100%;"<%- attr('placeholder', field.placeholder) %>>
+              <button type="button" class="btn-ghost toggle-password" data-target="<%= inputId %>" aria-label="Mostrar u ocultar" style="position:absolute; right:2px; top:2px;">
+                <i class="ph ph-eye"></i>
+              </button>
+            </div>
+          <% } else { %>
+            <input type="text" id="<%= inputId %>" name="<%= inputId %>" value="<%= value %>">
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+  <% }) %>
+
+  <div>
+    <button type="submit" class="btn btn-primary"><i class="ph ph-check"></i> Guardar credenciales</button>
+  </div>
+</form>
+
+<script>
+  document.querySelectorAll('.toggle-password').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var input = document.getElementById(btn.getAttribute('data-target'));
+      var icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'ph ph-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'ph ph-eye';
+      }
+    });
+  });
+</script>
