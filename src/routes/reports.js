@@ -235,6 +235,7 @@ router.get('/:record_id/compose', async (req, res, next) => {
       impressionsVariation: prev ? pctChange(record.impressions, prev.impressions) : '',
       clicksVariation: prev ? pctChange(record.clicks, prev.clicks) : '',
       justSent: req.query.sent === '1',
+      sentTo: req.query.to || site.client_email,
       justError: req.query.error === '1',
     });
   } catch (err) {
@@ -284,7 +285,7 @@ router.post('/:record_id/send', async (req, res, next) => {
     }
 
     await recordsQueries.setEmailSentAt(record.id);
-    res.redirect(`/reports/${record.id}/compose?sent=1`);
+    res.redirect(`/reports/${record.id}/compose?sent=1&to=${encodeURIComponent(req.body.to)}`);
   } catch (err) {
     next(err);
   }
