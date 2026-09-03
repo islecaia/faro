@@ -193,14 +193,44 @@ function renderTemplate(templateBody, variables) {
   ));
 }
 
+// Los clientes de email no cargan el CSS externo de Quill: las clases ql-font-*, ql-size-*
+// y ql-align-* (los colores y negritas ya van inline) hay que convertirlas a estilo inline.
+const QUILL_CLASS_STYLES = {
+  'ql-font-monospace': 'font-family: monospace',
+  'ql-font-serif': 'font-family: serif',
+  'ql-size-small': 'font-size: 0.75em',
+  'ql-size-large': 'font-size: 1.5em',
+  'ql-size-huge': 'font-size: 2.5em',
+  'ql-align-center': 'text-align: center',
+  'ql-align-right': 'text-align: right',
+  'ql-align-justify': 'text-align: justify',
+};
+
+function inlineQuillClasses(html) {
+  return html.replace(/<([a-z][a-z0-9]*)\b([^>]*)>/gi, (fullTag, tagName, attrs) => {
+    const classMatch = attrs.match(/class\s*=\s*"([^"]*)"/i);
+    if (!classMatch) return fullTag;
+
+    const extraStyles = classMatch[1].split(/\s+/).filter(Boolean).map((cls) => QUILL_CLASS_STYLES[cls]).filter(Boolean);
+    if (!extraStyles.length) return fullTag;
+
+    const styleMatch = attrs.match(/style\s*=\s*"([^"]*)"/i);
+    const newAttrs = styleMatch
+      ? attrs.replace(/style\s*=\s*"([^"]*)"/i, `style="${styleMatch[1].replace(/;\s*$/, '')}; ${extraStyles.join('; ')}"`)
+      : `${attrs} style="${extraStyles.join('; ')}"`;
+    return `<${tagName}${newAttrs}>`;
+  });
+}
+
 // Construye el HTML final del informe compuesto: si hay una plantilla personalizada guardada
-// en /template (HTML generado por el editor Quill), sustituye sus variables directamente
-// sobre ese HTML; si no, usa la plantilla fija de siempre como fallback.
+// en /template (HTML generado por el editor Quill), sustituye sus variables y convierte sus
+// clases a estilo inline; si no, usa la plantilla fija de siempre como fallback.
 async function buildComposedEmailHtml(record, site, body) {
   const template = await templateQueries.getTemplate();
   if (template && template.body) {
     const rendered = renderTemplate(template.body, buildTemplateVariables(record, site, body));
-    return `<div style="background:#ffffff; color:#222222; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.6;">${rendered}</div>`;
+    const inlined = inlineQuillClasses(rendered);
+    return `<div style="background:#ffffff; color:#222222; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.6;">${inlined}</div>`;
   }
   return emailService.renderComposedReportHtml({ ...body, site_name: site.name });
 }
