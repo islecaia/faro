@@ -162,6 +162,7 @@ function variationText(value, variation) {
 // recommendation_1/2/3 (next_steps es texto libre sin variable propia en la plantilla).
 function buildTemplateVariables(record, site, body) {
   return {
+    nombre: body.nombre || '',
     sitio: site.name,
     periodo: new Date(record.period).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
     impresiones: variationText(body.impressions, body.impressions_variation),

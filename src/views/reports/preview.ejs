@@ -23,7 +23,8 @@ const previewDoc = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
   </a>
   <form id="confirm-send-form" action="/reports/<%= record.id %>/send" method="post" style="display:inline;">
     <input type="hidden" name="to" value="<%= formData.to %>">
-    <% Object.entries(formData).filter(([key]) => key !== 'to').forEach(([key, value]) => { %>
+    <input type="hidden" name="nombre" value="<%= formData.nombre %>">
+    <% Object.entries(formData).filter(([key]) => key !== 'to' && key !== 'nombre').forEach(([key, value]) => { %>
       <input type="hidden" name="<%= key %>" value="<%= value %>">
     <% }) %>
     <button type="submit" id="confirm-send-btn" class="btn btn-primary">

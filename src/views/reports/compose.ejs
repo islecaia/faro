@@ -35,6 +35,10 @@ function ratingOptions(score) {
 <form id="compose-form" action="/reports/<%= record.id %>/preview" method="post" class="form-grid">
   <p class="section-label">Cabecera</p>
   <div class="field">
+    <label for="nombre">Nombre del cliente</label>
+    <input type="text" id="nombre" name="nombre">
+  </div>
+  <div class="field">
     <label for="to">Email destinatario</label>
     <input type="email" id="to" name="to" value="<%= site.client_email %>" required>
   </div>
