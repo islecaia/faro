@@ -14,7 +14,7 @@
   </div>
 <% } %>
 
-<form action="/reports/<%= record.id %>/send" method="post" class="form-grid">
+<form id="compose-form" action="/reports/<%= record.id %>/send" method="post" class="form-grid">
   <p class="section-label">Cabecera</p>
   <div class="field">
     <label for="recipient_email">Email destinatario</label>
@@ -118,7 +118,41 @@
   </div>
 
   <div>
-    <button type="submit" class="btn btn-primary"><i class="ph ph-envelope"></i> Enviar</button>
+    <button type="submit" id="compose-send-btn" class="btn btn-primary">
+      <i class="ph ph-envelope"></i> <span id="compose-send-btn-label">Enviar</span>
+    </button>
     <a href="/reports/<%= record.id %>" class="btn btn-ghost">Cancelar</a>
   </div>
 </form>
+
+<style>
+  .btn-spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    vertical-align: -2px;
+    animation: compose-btn-spin 700ms linear infinite;
+  }
+  @keyframes compose-btn-spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<script>
+  (function () {
+    var form = document.getElementById('compose-form');
+    var btn = document.getElementById('compose-send-btn');
+    if (!form || !btn) return;
+
+    // Envío normal del formulario (sin fetch): la propia redirección del servidor a
+    // /compose?sent=1 o /compose?error=1 vuelve a renderizar esta página con el botón
+    // en su estado inicial, así que no hace falta restaurarlo aquí.
+    form.addEventListener('submit', function () {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner"></span> Enviando…';
+    });
+  })();
+</script>
